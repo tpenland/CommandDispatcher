@@ -1,0 +1,14 @@
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Utilities/bin/Debug/net8.0/mosquitto.conf
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Utilities/bin/Debug/net8.0/CommandDispatcher.Utilities.deps.json
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Utilities/bin/Debug/net8.0/CommandDispatcher.Utilities.dll
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Utilities/bin/Debug/net8.0/CommandDispatcher.Utilities.pdb
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Utilities/obj/Debug/net8.0/CommandDispatcher.Utilities.csproj.AssemblyReference.cache
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Utilities/obj/Debug/net8.0/CommandDispatcher.Utilities.GeneratedMSBuildEditorConfig.editorconfig
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Utilities/obj/Debug/net8.0/CommandDispatcher.Utilities.AssemblyInfoInputs.cache
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Utilities/obj/Debug/net8.0/CommandDispatcher.Utilities.AssemblyInfo.cs
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Utilities/obj/Debug/net8.0/CommandDispatcher.Utilities.csproj.CoreCompileInputs.cache
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Utilities/obj/Debug/net8.0/CommandDispatcher.Utilities.sourcelink.json
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Utilities/obj/Debug/net8.0/CommandDispatcher.Utilities.dll
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Utilities/obj/Debug/net8.0/refint/CommandDispatcher.Utilities.dll
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Utilities/obj/Debug/net8.0/CommandDispatcher.Utilities.pdb
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Utilities/obj/Debug/net8.0/ref/CommandDispatcher.Utilities.dll

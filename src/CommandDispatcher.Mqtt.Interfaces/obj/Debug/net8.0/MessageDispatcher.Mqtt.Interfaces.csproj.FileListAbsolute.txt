@@ -1,0 +1,13 @@
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.Interfaces/bin/Debug/net8.0/CommandDispatcher.Mqtt.Interfaces.deps.json
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.Interfaces/bin/Debug/net8.0/CommandDispatcher.Mqtt.Interfaces.dll
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.Interfaces/bin/Debug/net8.0/CommandDispatcher.Mqtt.Interfaces.pdb
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.Interfaces/obj/Debug/net8.0/CommandDispatcher.Mqtt.Interfaces.csproj.AssemblyReference.cache
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.Interfaces/obj/Debug/net8.0/CommandDispatcher.Mqtt.Interfaces.GeneratedMSBuildEditorConfig.editorconfig
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.Interfaces/obj/Debug/net8.0/CommandDispatcher.Mqtt.Interfaces.AssemblyInfoInputs.cache
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.Interfaces/obj/Debug/net8.0/CommandDispatcher.Mqtt.Interfaces.AssemblyInfo.cs
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.Interfaces/obj/Debug/net8.0/CommandDispatcher.Mqtt.Interfaces.csproj.CoreCompileInputs.cache
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.Interfaces/obj/Debug/net8.0/CommandDispatcher.Mqtt.Interfaces.sourcelink.json
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.Interfaces/obj/Debug/net8.0/CommandDispatcher.Mqtt.Interfaces.dll
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.Interfaces/obj/Debug/net8.0/refint/CommandDispatcher.Mqtt.Interfaces.dll
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.Interfaces/obj/Debug/net8.0/CommandDispatcher.Mqtt.Interfaces.pdb
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.Interfaces/obj/Debug/net8.0/ref/CommandDispatcher.Mqtt.Interfaces.dll

@@ -1,0 +1,13 @@
+{
+    "id":"b968686b979040a19e38e55280cf56bc",
+    "correlationId":"180dca13-81b7-49e5-a081-9bf47be645ec",
+    "contextId":"71df678b-fec8-46c0-ad2d-585116067177",
+    "messageType":"GetDevice",
+    "payload":"1",
+    "createdAt":"2023-12-04T07:27:50.351065Z"
+}
+
+{"id":"b968686b979040a19e38e55280cf56bc", "correlationId":"180dca13-81b7-49e5-a081-9bf47be645ec", "contextId":"71df678b-fec8-46c0-ad2d-585116067177", "messageType":"GetDevice", "payload":"1", "createdAt":"2023-12-04T07:27:50.351065Z"}
+{"id":"b968686b979040a19e38e55280cf56bd", "correlationId":"180dca13-81b7-49e5-a081-9bf47be645ed", "contextId":"71df678b-fec8-46c0-ad2d-585116067178", "messageType":"CreateDevice", "payload":"{\"name\":\"device007\",\"type\": \"thermostat_v7\",\"isOnline\":true}", "createdAt":"2023-12-04T07:27:50.351065Z"}
+
+'{"name":"device005","type": "thermostat_v3","isOnline":true}'

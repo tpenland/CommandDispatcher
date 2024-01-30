@@ -1,0 +1,16 @@
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.CloudEvents/bin/Debug/net8.0/CommandDispatcher.Mqtt.CloudEvents.deps.json
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.CloudEvents/bin/Debug/net8.0/CommandDispatcher.Mqtt.CloudEvents.dll
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.CloudEvents/bin/Debug/net8.0/CommandDispatcher.Mqtt.CloudEvents.pdb
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.CloudEvents/bin/Debug/net8.0/CommandDispatcher.Mqtt.Interfaces.dll
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.CloudEvents/bin/Debug/net8.0/CommandDispatcher.Mqtt.Interfaces.pdb
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.CloudEvents/obj/Debug/net8.0/CommandDispatcher.Mqtt.CloudEvents.csproj.AssemblyReference.cache
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.CloudEvents/obj/Debug/net8.0/CommandDispatcher.Mqtt.CloudEvents.GeneratedMSBuildEditorConfig.editorconfig
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.CloudEvents/obj/Debug/net8.0/CommandDispatcher.Mqtt.CloudEvents.AssemblyInfoInputs.cache
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.CloudEvents/obj/Debug/net8.0/CommandDispatcher.Mqtt.CloudEvents.AssemblyInfo.cs
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.CloudEvents/obj/Debug/net8.0/CommandDispatcher.Mqtt.CloudEvents.csproj.CoreCompileInputs.cache
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.CloudEvents/obj/Debug/net8.0/CommandDispatcher.Mqtt.CloudEvents.sourcelink.json
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.CloudEvents/obj/Debug/net8.0/CommandDispatcher.Mqtt.CloudEvents.csproj.CopyComplete
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.CloudEvents/obj/Debug/net8.0/CommandDispatcher.Mqtt.CloudEvents.dll
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.CloudEvents/obj/Debug/net8.0/refint/CommandDispatcher.Mqtt.CloudEvents.dll
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.CloudEvents/obj/Debug/net8.0/CommandDispatcher.Mqtt.CloudEvents.pdb
+/home/todd/dev/github/CommandDispatcher/src/CommandDispatcher.Mqtt.CloudEvents/obj/Debug/net8.0/ref/CommandDispatcher.Mqtt.CloudEvents.dll

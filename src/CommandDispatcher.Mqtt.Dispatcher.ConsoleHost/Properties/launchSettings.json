@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "CommandDispatcher.Mqtt.Dispatcher.ConsoleHost": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

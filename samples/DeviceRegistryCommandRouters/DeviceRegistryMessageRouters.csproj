@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>	
+        <EnableDynamicLoading>true</EnableDynamicLoading>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Reference Include="Imv.Messaging.Mqtt.Interfaces">
+			<HintPath>..\Imv.Messaging.Libraries\Imv.Messaging.Mqtt.Interfaces.dll</HintPath>
+			<Private>false</Private>
+			<ExcludeAssets>runtime</ExcludeAssets>
+		</Reference>
+		<Reference Include="Imv.Messaging.Mqtt.Models">
+			<HintPath>..\Imv.Messaging.Libraries\Imv.Messaging.Mqtt.Models.dll</HintPath>
+			<Private>false</Private>
+			<ExcludeAssets>runtime</ExcludeAssets>
+		</Reference>
+		<PackageReference Include="CommunityToolkit.Diagnostics" Version="8.2.2" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+	    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+  </ItemGroup>
+
+	<!-- <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	  <Exec Command="call ..\updateDeviceRegistryCommandRouterDlls.bat" />
+	</Target> -->
+
+</Project>

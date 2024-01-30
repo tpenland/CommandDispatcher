@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: message-dispatcher-deployment
+  labels:
+    app: message-dispatcher
+    environment: dev
+    type: mqtt-listener
+spec:
+  template:
+    metadata:
+      name: message-dispatcher-pod
+      labels:
+        app: message-dispatcher
+        environment: dev
+        type: mqtt-listener
+    spec:
+      containers:
+      - name: message-dispatcher
+        image: message-dispatcher:1.0
+      # imagePullSecrets:
+      # - name: acrkey
+  replicas: 1
+  selector:
+    matchLabels:
+      app: message-dispatcher
