@@ -10,19 +10,18 @@ namespace CommandDispatcher.TestHelpers
         {
             yield return new object[]
             {
-                    GetMessageEnvelop(1)
+                    Generate(1)
             };
 
-            // parameters to test send email failed
             yield return new object[]
             {
-                    GetMessageEnvelop(3)
+                    Generate(3)
             };
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        internal CloudEvent GetMessageEnvelop(int samplePointCount)
+        public CloudEvent Generate(int samplePointCount)
         {
             string payload;
 

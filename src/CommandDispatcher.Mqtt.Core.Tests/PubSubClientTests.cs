@@ -14,21 +14,67 @@ namespace CommandDispatcher.Mqtt.Core.Tests
             DockerHelper.Instance.StartMosquitto($"{Directory.GetCurrentDirectory()}{Path.DirectorySeparatorChar}mosquitto.conf");
         }
 
-        [Theory]
-        [ClassData(typeof(CloudEventGenerator))]
-        public async Task Publish_CloudEvents_SendCorrectlyTest(CloudEvent testMessage)
+        [Fact]
+        public async Task IncorrectMqttSettings_NonGeneric_ThrowsException()
         {
             var mqttSettings = new MqttSettings
             {
                 ServerAddress = "localhost",
-                ServerPort = 1883,
+                ServerPort = 1884,
+                MqttQualityOfServiceLevel = 0
             };
 
-            string topic = GenerateRandomTopicName();
+            var logger = new Mock<ILogger<PubSubClient>>();
+            var client = new PubSubClient(mqttSettings, logger.Object);
+            var ex = default(Exception);
+            var eventReceived = new ManualResetEvent(false);
+            client.ConnectingFailed += (args) => 
+            { 
+                ex = args.Exception; 
+                eventReceived.Set();
+                return Task.CompletedTask;
+            };
+            await client.Publish(GenerateRandomTopicName(), "Bird is the word.");
+            eventReceived.WaitOne(5000);
+            Assert.NotNull(ex);
+            Assert.Contains("1884", ex.Message);
+            Assert.Contains("localhost", ex.Message);
+        }
+
+        [Fact]
+        public async Task IncorrectMqttSettings_Generic_ThrowsException()
+        {
+            var mqttSettings = new MqttSettings
+            {
+                ServerAddress = "localhost",
+                ServerPort = 1884,
+            };
 
             var logger = new Mock<ILogger<PubSubClient<CloudEvent>>>();
-            var pubSubClient = new PubSubClient<CloudEvent>(mqttSettings, new CloudEvenMqttFormatter(), logger.Object);
-            var evalPubSubClient = new PubSubClient<CloudEvent>(mqttSettings, new CloudEvenMqttFormatter(), logger.Object);
+            var client = new PubSubClient<CloudEvent>(mqttSettings, new CloudEvenMqttFormatter(), logger.Object);
+            var ex = default(Exception);
+            var eventReceived = new ManualResetEvent(false);
+            client.ConnectingFailed += (args) =>
+            {
+                ex = args.Exception;
+                eventReceived.Set();
+                return Task.CompletedTask;
+            };
+            await client.Publish(GenerateRandomTopicName(), new CloudEventGenerator().Generate(1));
+            eventReceived.WaitOne(5000);
+            Assert.NotNull(ex);
+            Assert.Contains("1884", ex.Message);
+            Assert.Contains("localhost", ex.Message);
+        }
+
+        [Theory]
+        [ClassData(typeof(CloudEventGenerator))]
+        public async Task Publish_CloudEvents_SendCorrectlyTest(CloudEvent testMessage)
+        {
+            string topic = GenerateRandomTopicName();
+
+            var pubSubClient = GetTestPubSubClientForCloudEvents();
+            var evalPubSubClient = GetTestPubSubClientForCloudEvents();
 
             var messageReceived = new ManualResetEvent(false);
             CloudEvent? receivedMessage = default;
@@ -59,14 +105,7 @@ namespace CommandDispatcher.Mqtt.Core.Tests
             const string testTopic2 = "testtopic2";
             const string testTopic3 = "testtopic2/mytest";
 
-            var mqttSettings = new MqttSettings
-            {
-                ServerAddress = "localhost",
-                ServerPort = 1883,
-            };
-
-            var logger = new Mock<ILogger>();
-            var pubSubClient = new PubSubClient(mqttSettings, logger.Object);
+            var pubSubClient = GetTestPubSubClient();
 
             string receivedOnTopic = string.Empty;
 
@@ -115,6 +154,165 @@ namespace CommandDispatcher.Mqtt.Core.Tests
             Assert.Equal(testTopic2, receivedOnTopic);
         }
 
+        [Fact]
+        public async Task Publish_RetainedMessage_IsRetained()
+        {
+            var testTopic = GenerateRandomTopicName();
+
+            var pubSubClient = GetTestPubSubClientForCloudEvents();
+            var testMessage = new CloudEventGenerator().Generate(1);
+            testMessage.SetCorrelationId(null);
+            await pubSubClient.Publish(testTopic, testMessage, true);
+            await Task.Delay(1000);
+
+            var receivedMessage = new ManualResetEvent(false);
+            CloudEvent? messageReceived = default;
+            await pubSubClient.Subscribe(testTopic, (string topic, CloudEvent message) =>
+            {
+                messageReceived = message;
+                receivedMessage.Set();
+                return Task.CompletedTask;
+            });
+
+            receivedMessage.WaitOne(1000);
+
+            Assert.True(receivedMessage != default);
+            Assert.True(new CloudEventEqualityComparer().Equals(testMessage, messageReceived), $"Expected {testMessage?.ToString()} but received {messageReceived}");
+        }
+
+        [Fact]
+        public async Task ClearRetainedMessage_Generic_SuccessfullyClearsMessage()
+        {
+            var testTopic = GenerateRandomTopicName();
+
+            var pubSubClient = GetTestPubSubClientForCloudEvents();
+            var testMessage = new CloudEventGenerator().Generate(1);
+            await pubSubClient.Publish(testTopic, testMessage, true);
+            await Task.Delay(1000);
+
+            await pubSubClient.ClearRetainedMessage(testTopic);
+
+            var receivedMessage = new ManualResetEvent(false);
+            CloudEvent? messageReceived = default;
+            await pubSubClient.Subscribe(testTopic, (string topic, CloudEvent message) =>
+            {
+                messageReceived = message;
+                receivedMessage.Set();
+                return Task.CompletedTask;
+            });
+
+            receivedMessage.WaitOne(1000);
+
+            Assert.Equal(default, messageReceived);
+        }
+
+        [Fact]
+        public async Task ClearRetainedMessage_NonGeneric_SuccessfullyClearsMessage()
+        {
+            var testTopic = GenerateRandomTopicName();
+
+            var pubSubClient = GetTestPubSubClient();
+            var testMessage = "Important message";
+            await pubSubClient.Publish(testTopic, testMessage, true);
+            await Task.Delay(1000);
+
+            await pubSubClient.ClearRetainedMessage(testTopic);
+
+            var receivedMessage = new ManualResetEvent(false);
+            string? messageReceived = default;
+            await pubSubClient.Subscribe(testTopic, (string topic, string message) =>
+            {
+                messageReceived = message;
+                receivedMessage.Set();
+                return Task.CompletedTask;
+            });
+
+            receivedMessage.WaitOne(1000);
+
+            Assert.Equal(default, messageReceived);
+        }
+
+        [Fact]
+        public async Task Unsubscribe_NonGeneric_DoesNotGetMessage()
+        {
+            string topic = GenerateRandomTopicName();
+            var testMessage = new CloudEventGenerator().Generate(1);
+
+            var pubSubClient = GetTestPubSubClientForCloudEvents();
+            var evalPubSubClient = GetTestPubSubClientForCloudEvents();
+
+            var messageReceived = new ManualResetEvent(false);
+            CloudEvent? receivedMessage1 = default;
+            await evalPubSubClient.Subscribe(topic, (string topic, CloudEvent message) =>
+            {
+                receivedMessage1 = message;
+                messageReceived.Set();
+                return Task.CompletedTask;
+            });
+
+            await Task.Delay(1000);
+
+            await pubSubClient.Publish(topic, testMessage);
+
+            messageReceived.WaitOne(1000);
+
+            messageReceived.Reset();
+
+            CloudEvent? receivedMessage2 = default;
+            await pubSubClient.UnSubscribe(topic);
+            await pubSubClient.Publish(topic, testMessage);
+            await Task.Delay(1000);
+
+            Assert.True(receivedMessage1 != default);
+            Assert.True(new CloudEventEqualityComparer().Equals(testMessage, receivedMessage1), $"Expected {testMessage?.ToString()} but received {receivedMessage1}");
+            Assert.True(receivedMessage2 == default);
+        }
+
+        [Fact]
+        public async Task Unsubscribe_Generic_DoesNotGetMessage()
+        {
+            string topic = GenerateRandomTopicName();
+            var testMessage = "Test message";
+
+            var pubSubClient = GetTestPubSubClient();
+            var evalPubSubClient = GetTestPubSubClient();
+
+            var messageReceived = new ManualResetEvent(false);
+            string? receivedMessage1 = default;
+            await evalPubSubClient.Subscribe(topic, (string topic, string message) =>
+            {
+                receivedMessage1 = message;
+                messageReceived.Set();
+                return Task.CompletedTask;
+            });
+
+            await Task.Delay(1000);
+
+            await pubSubClient.Publish(topic, testMessage);
+
+            messageReceived.WaitOne(1000);
+
+            messageReceived.Reset();
+
+            string? receivedMessage2 = default;
+            await pubSubClient.UnSubscribe(topic);
+            await pubSubClient.Publish(topic, testMessage);
+            await Task.Delay(1000);
+
+            Assert.True(receivedMessage1 != default);
+            Assert.Equal(testMessage, receivedMessage1);
+            Assert.True(receivedMessage2 == default);
+        }
+
+        [Fact]
+        public async Task PubSubClient_Dispose_CleansUp()
+        {
+            var pubSubClient = GetTestPubSubClientForCloudEvents();
+
+            pubSubClient.Dispose();
+            await Assert.ThrowsAsync<ObjectDisposedException>(async () => await pubSubClient.Publish(GenerateRandomTopicName(), new CloudEventGenerator().Generate(1)));
+        }
+
         public static string GenerateRandomTopicName(int length = 8)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -123,6 +321,30 @@ namespace CommandDispatcher.Mqtt.Core.Tests
             var randomString = new string(Enumerable.Repeat(chars, length)
                                                     .Select(s => s[random.Next(s.Length)]).ToArray());
             return randomString;
+        }
+
+        public PubSubClient<CloudEvent> GetTestPubSubClientForCloudEvents()
+        {
+            var mqttSettings = new MqttSettings
+            {
+                ServerAddress = "localhost",
+                ServerPort = 1883,
+            };
+
+            var logger = new Mock<ILogger<PubSubClient<CloudEvent>>>();
+            return new PubSubClient<CloudEvent>(mqttSettings, new CloudEvenMqttFormatter(), logger.Object);
+        }
+
+        public PubSubClient GetTestPubSubClient()
+        {
+            var mqttSettings = new MqttSettings
+            {
+                ServerAddress = "localhost",
+                ServerPort = 1883,
+            };
+
+            var logger = new Mock<ILogger<PubSubClient>>();
+            return new PubSubClient(mqttSettings, logger.Object);
         }
     }
 }

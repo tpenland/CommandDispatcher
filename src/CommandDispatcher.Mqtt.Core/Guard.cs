@@ -1,16 +1,18 @@
-﻿namespace CommandDispatcher.Mqtt.Core
+﻿using System.Runtime.CompilerServices;
+
+namespace CommandDispatcher.Mqtt.Core
 {
     public static class Guard
     {
-        public static void IsNotNull(object value, string name)
+        public static void IsNull<T>(T? value, [CallerArgumentExpression(nameof(value))] string name = "")
         {
-            if (value is null || value.Equals(default))
+            if (value is null)
             {
                 throw new ArgumentException(name);
             }
         }
 
-        public static void IsNotEmpty<T>(IList<T> list, string name)
+        public static void IsEmpty<T>(IList<T>? list, [CallerArgumentExpression(nameof(list))] string name = "")
         {
             if (list is null || list.Count == 0)
             {

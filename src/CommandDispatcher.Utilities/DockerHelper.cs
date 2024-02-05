@@ -42,6 +42,13 @@ public class DockerHelper : IDisposable
         return foundContainer;
     }
 
+    public async Task<ContainerListResponse?> FindContainerByContainerId(string containerId)
+    {
+        IList<ContainerListResponse> containers = await _client.Containers.ListContainersAsync(new ContainersListParameters() { All = true });
+        ContainerListResponse? foundContainer = containers.FirstOrDefault(c => c.ID.Contains(containerId));
+        return foundContainer;
+    }
+
     public async Task<ContainerListResponse?> FindContainerByImageName(string imageName)
     {
         IList<ContainerListResponse> containers = await _client.Containers.ListContainersAsync(new ContainersListParameters() { All = true });
@@ -61,14 +68,18 @@ public class DockerHelper : IDisposable
 
     public async Task RemoveImage(string imageId)
     {
-        await _client.Images.DeleteImageAsync(imageId, new ImageDeleteParameters());
+        ImagesListResponse? images = await FindImage(imageId);
+        if (images is not null)
+        {
+            await _client.Images.DeleteImageAsync(imageId, new ImageDeleteParameters());
+        }
     }
 
     public void StartContainer(CreateContainerParameters containerParameters)
     {
         lock (_lockObject)
         {
-            DockerHelper.Instance.RunContainer(containerParameters).Wait();
+            Instance.RunContainer(containerParameters).Wait();
         }
     }
 
@@ -137,7 +148,11 @@ public class DockerHelper : IDisposable
     {
         foreach (string id in _startedContainerIds)
         {
-            await _client.Containers.StopContainerAsync(id, new ContainerStopParameters());
+            var response = await FindContainerByContainerId(id);
+            if (response is not null)
+            {
+                await _client.Containers.StopContainerAsync(id, new ContainerStopParameters());
+            }
         }
     }
 

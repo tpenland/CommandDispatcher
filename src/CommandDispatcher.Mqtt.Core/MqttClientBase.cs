@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using MQTTnet.Extensions.ManagedClient;
 using MQTTnet;
 using MQTTnet.Client;
+using MQTTnet.Extensions.ManagedClient;
 
 namespace CommandDispatcher.Mqtt.Core
 {
@@ -18,8 +18,8 @@ namespace CommandDispatcher.Mqtt.Core
 
         protected MqttClientBase(MqttSettings mqttSettings, ILogger logger)
         {
-            Guard.IsNotNull(mqttSettings, nameof(mqttSettings));
-            Guard.IsNotNull(logger, nameof(logger));
+            Guard.IsNull(mqttSettings);
+            Guard.IsNull(logger);
 
             _mqttSettings = mqttSettings;
             _logger = logger;
@@ -31,23 +31,9 @@ namespace CommandDispatcher.Mqtt.Core
         /// <returns></returns>
         protected virtual async Task StartAsync()
         {
-            try
-            {
-                _logger.LogInformation("Starting MQTT client.");
-                _mqttClient = new MqttFactory().CreateManagedMqttClient();
-
-                if (_mqttClient == null)
-                {
-                    throw new ArgumentException("Unable to create MQTT client.");
-                }
-
-                await InitializeConnection();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("{exception}", ex.ToString());
-                throw;
-            }
+            _logger.LogInformation("Starting MQTT client.");
+            _mqttClient = new MqttFactory().CreateManagedMqttClient();
+            await InitializeConnection();
         }
 
         /// <summary>

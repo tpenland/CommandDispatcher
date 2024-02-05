@@ -8,10 +8,16 @@ using MQTTnet.Protocol;
 
 namespace CommandDispatcher.Mqtt.Core
 {
+    /// <summary>
+    /// Provides a facade over MqttClientBase and the underlying MqttClient.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class PubSubClient<T> : MqttClientBase, IPubSubClient<T>
     {
         private readonly IMqttMessageFormatter<T> _messageFormatter;
         private readonly Dictionary<string, List<IPubSubClient<T>.MessageReceivedCallback>> _callbacks = new();
+
+        public event Func<ConnectingFailedEventArgs, Task>? ConnectingFailed;
 
         /// <summary>
         /// Constructor
@@ -41,7 +47,8 @@ namespace CommandDispatcher.Mqtt.Core
         /// <param name="payload"></param>
         public async Task Publish(string topic, T payload, bool isRetained = false)
         {
-            Guard.IsNotNull(topic, nameof(topic));
+            Guard.IsNull(topic);
+            Guard.IsNull(payload);
 
             byte[] formattedMessage = _messageFormatter.EncodeMessage(payload, out var contentType);
 
@@ -70,7 +77,7 @@ namespace CommandDispatcher.Mqtt.Core
         /// <returns></returns>
         public async Task ClearRetainedMessage(string topic)
         {
-            Guard.IsNotNull(topic, nameof(topic));
+            Guard.IsNull(topic);
 
             byte[] zeroBytes = [];
             var qos = (MqttQualityOfServiceLevel)_mqttSettings!.MqttQualityOfServiceLevel;
@@ -93,8 +100,8 @@ namespace CommandDispatcher.Mqtt.Core
         /// <returns></returns>
         public async Task Subscribe(string topic, IPubSubClient<T>.MessageReceivedCallback callback)
         {
-            Guard.IsNotNull(topic, nameof(topic));
-            Guard.IsNotNull(callback, nameof(callback));
+            Guard.IsNull(topic);
+            Guard.IsNull(callback);
 
             MqttTopicFilter topicFilter = new MqttTopicFilterBuilder()
                 .WithTopic(topic)
@@ -121,7 +128,7 @@ namespace CommandDispatcher.Mqtt.Core
         /// <returns></returns>
         public async Task UnSubscribe(string topic)
         {
-            Guard.IsNotNull(topic, nameof(topic));
+            Guard.IsNull(topic);
 
             _callbacks.Remove(topic);
             await _mqttClient!.UnsubscribeAsync(topic);
@@ -140,12 +147,6 @@ namespace CommandDispatcher.Mqtt.Core
             try
             {
                 var message = _messageFormatter.DecodeMessage(messageBytes);
-
-                if (message is null)
-                {
-                    _logger.LogWarning("Payload is empty or null.");
-                    return Task.CompletedTask;
-                }
 
                 if (_callbacks.Count != 0)
                 {
@@ -168,11 +169,21 @@ namespace CommandDispatcher.Mqtt.Core
 
             return Task.CompletedTask;
         }
+
+        protected override Task MqttClient_ConnectingFailedAsync(ConnectingFailedEventArgs arg)
+        {
+            base.MqttClient_ConnectingFailedAsync(arg);
+            return Task.Run(() => ConnectingFailed?.Invoke(arg));
+        }
     }
 
+    /// <summary>
+    /// Provides a facade over MqttClientBase and the underlying MqttClient.
+    /// </summary>
     public class PubSubClient : MqttClientBase, IPubSubClient
     {
         private readonly Dictionary<string, IPubSubClient.MessageReceivedCallback> _callbacks = new();
+        public event Func<ConnectingFailedEventArgs, Task>? ConnectingFailed;
 
         /// <summary>
         /// Constructor
@@ -203,8 +214,8 @@ namespace CommandDispatcher.Mqtt.Core
         /// <exception cref="NotImplementedException"></exception>
         public async Task Publish(string topic, string payload, bool isRetained = false)
         {
-            Guard.IsNotNull(topic, nameof(topic));
-            Guard.IsNotNull(payload, nameof(payload));
+            Guard.IsNull(topic);
+            Guard.IsNull(payload);
 
             var qos = (MqttQualityOfServiceLevel)_mqttSettings!.MqttQualityOfServiceLevel;
             MqttApplicationMessage message = new MqttApplicationMessageBuilder()
@@ -246,8 +257,8 @@ namespace CommandDispatcher.Mqtt.Core
         /// <returns></returns>
         public async Task Subscribe(string topic, IPubSubClient.MessageReceivedCallback callback)
         {
-            Guard.IsNotNull(topic, nameof(topic));
-            Guard.IsNotNull(callback, nameof(callback));
+            Guard.IsNull(topic);
+            Guard.IsNull(callback);
 
             MqttTopicFilter topicFilter = new MqttTopicFilterBuilder()
                 .WithTopic(topic)
@@ -267,7 +278,7 @@ namespace CommandDispatcher.Mqtt.Core
         /// <returns></returns>
         public async Task UnSubscribe(string topic)
         {
-            Guard.IsNotNull(topic, nameof(topic));
+            Guard.IsNull(topic);
 
             _callbacks.Remove(topic);
             await _mqttClient!.UnsubscribeAsync(topic);
@@ -301,6 +312,12 @@ namespace CommandDispatcher.Mqtt.Core
                 _logger.LogError("{exception}", ex.ToString());
                 return Task.CompletedTask;
             }
+        }
+
+        protected override Task MqttClient_ConnectingFailedAsync(ConnectingFailedEventArgs arg)
+        {
+            base.MqttClient_ConnectingFailedAsync(arg);
+            return Task.Run(() => ConnectingFailed?.Invoke(arg));
         }
     }
 }

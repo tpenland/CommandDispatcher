@@ -11,10 +11,10 @@ namespace CommandDispatcher.Mqtt.Core
 
         public CommandDispatcher(IPubSubClient<T> client, IEnumerable<ICommandRouter<T>> CommandRouters, ILogger<CommandDispatcher<T>> logger)
         {
-            Guard.IsNotNull(client, nameof(client));
-            Guard.IsNotNull(CommandRouters, nameof(CommandRouters));
-            Guard.IsNotEmpty(CommandRouters.ToList(), nameof(CommandRouters));
-            Guard.IsNotNull(logger, nameof(logger));
+            Guard.IsNull(client, nameof(client));
+            Guard.IsNull(CommandRouters, nameof(CommandRouters));
+            Guard.IsEmpty(CommandRouters.ToList(), nameof(CommandRouters));
+            Guard.IsNull(logger, nameof(logger));
 
             _logger = logger;
             foreach (ICommandRouter<T> router in CommandRouters)

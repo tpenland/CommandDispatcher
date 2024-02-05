@@ -8,7 +8,7 @@ namespace CommandDispatcher.Mqtt.Core
     {
         public T DecodeMessage(byte[] message, ContentType? contentType = null)
         {
-            Guard.IsNotNull(message, nameof(message));
+            Guard.IsNull(message);
 
             var decodedMessage = JsonSerializer.Deserialize<T>(message);
             return decodedMessage is null

@@ -71,6 +71,7 @@ namespace CommandDispatcher.Mqtt.Core.Tests
             Assert.True(correlationCount.Count == 1, "There should only be 1 repeated correlationId");
             var messageE = testMessages.First(m => m.Item2.Data!.ToString() == "E").Item2;
             Assert.True(correlationCount[0].CorrelationId == messageE.GetCorrelationId(), "Message with Data E should be the duplicated message.");
+            Assert.IsType<string>(messageE.GetCorrelationIdType());
         }
 
         internal List<ICommandRouter<CloudEvent>> GetCommandRouters()
