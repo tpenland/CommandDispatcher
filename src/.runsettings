@@ -35,7 +35,7 @@ Included items must then not match any entries in the exclude list to remain inc
 								<ModulePath>.*CommandDispatcher.Mqtt.CloudEvents.Tests.dll</ModulePath>
 								<ModulePath>.*CommandDispatcher.Mqtt.Core.Tests.dll</ModulePath>
 								<ModulePath>.*CommandDispatcher.Utilities.Tests.dll</ModulePath>
-								<ModulePath>.*CommandDispatcher.TestHelpers.dll</ModulePath>
+								<ModulePath>.*CommandDispatcher.TestHelpers.dll</ModulePath>g
 								<ModulePath>.*xunit.*</ModulePath>
 								<ModulePath>.*moq.*</ModulePath>
 							</Exclude>
