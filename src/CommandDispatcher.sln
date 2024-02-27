@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommandDispatcher.Mqtt.Clou
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommandDispatcher.Mqtt.CloudEvents.Tests", "CommandDispatcher.Mqtt.CloudEvents.Tests\CommandDispatcher.Mqtt.CloudEvents.Tests.csproj", "{A788CE0B-6A09-4A1B-87FD-FCA6EF542CA8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandDispatcher.TestHelpers", "CommandDispatcher.TestHelpers\CommandDispatcher.TestHelpers.csproj", "{98C62C48-1729-4DD7-B11F-B74711E701C9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommandDispatcher.TestHelpers", "CommandDispatcher.TestHelpers\CommandDispatcher.TestHelpers.csproj", "{98C62C48-1729-4DD7-B11F-B74711E701C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

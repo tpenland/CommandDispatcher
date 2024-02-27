@@ -1,23 +1,28 @@
 # Command Dispatcher
 
-## Overview and Rationale
+## Overview
 
-The Command Dispatcher libraries offer two core capabilities:
+This library is meant as a code accelerator helping custom workloads at the edge handle the expected synchronous request/response pattern of executing commands and sending responses when using the asynchronous publish/subscribe pattern of MQTT. More specifically, it is meant to help complex workloads that receive n number of different commands on one or more incoming topics properly route each command to the appropriate command handler, and return one or more responses back to the appropriate outbound topic. It has the following features:
 
-1. A wrapper over an MQTT library.
-2. A routing mechanism for MQTT messages.
+1. Simple interface-based routing mechanism using a variation of the [strategy pattern](https://en.wikipedia.org/wiki/Strategy_pattern#:~:text=In%20computer%20programming%2C%20the%20strategy,family%20of%20algorithms%20to%20use).
+   1. Message routers can define routing rules based on message attributes and include the ability to publish responses.
+   2. New commands can be added without changing existing code.
+2. Integrates the [CloudEvents](https://cloudevents.io/) specification using the [CloudEvents C# sdk](https://github.com/cloudevents/sdk-csharp?tab=readme-ov-file).
+   1. Includes an implementation of [CorrelationId](./src/CommandDispatcher.Mqtt.CloudEvents/CorrelationId.cs) based on CloudEvents extension attribute guidance.
+   2. Use of CloudEvents is entirely optional and any custom envelope or even no envelope can be used instead.
+3. Includes an optional console host that allows the CommandDispatcher to be run as a stand-alone process acting as a gateway for other processes.
+   1. Uses the [C# plugin model](https://learn.microsoft.com/en-us/dotnet/core/tutorials/creating-app-with-plugin-support) to enable adding message handlers from other processes without altering any code in the console host.
+   2. Simply implement the appropriate interfaces (ICommandRouter and IRegisterCommandRouter) in a dll, drop it in the appropriate folder and add the dll name to the manifest.
+4. Uses the MqttNet library for all Mqtt communication.
+   1. Contains a facade, [PubSubClient](./src/CommandDispatcher.Mqtt.Core/PubSubClient.cs), used by the [CommandDispatcher](./src/CommandDispatcher.Mqtt.Core/CommandDispatcher.cs), that exposes simple publish and subscribe functionality.
+   2. The PubSubClient class can be used and/or extended, or substituted with an alternative implementation of [IPubSubClient](./src/CommandDispatcher.Mqtt.Interfaces/IPubSubClient.cs). 
+5. [Samples](./samples/README.md) folder that demonstrate the library's use:
+   1. For an example of implementing the library as embedded dlls see
+   2. For an example using the stand-alone console host versions see
 
-Why?
+## Design Considerations
 
-1. Why wrap an MQTT library? Why wrap 3rd party libraries at all?
-   - Facade: Present a simple interface tailored to our scenarios.
-     - This allows us to tailor the complexity of generic, general purpose libraries to the specificity of our specific scenarios. A facade allows us to hide that complexity and encode best practices, thereby helping developers fall into the pit of success.
-   - Decorator: Add behavior to a class by wrapping instead of subclassing.
-     - In addition to encoding best practices, a wrapper allows us to add business rules to ensure that they are consistently enforced in one place in the code. Details such as message envelopes, batching and compression, auditing, etc. can all be added to this wrapper library.
-
-2. Why do I need a routing mechanism? Isn't the topic structure sufficient?
-
-    To answer these questions, it is helpful to compare MQTT to the more widely understood HTTP model. In HTTP, a URL will route messages against a domain and resource structure to find the correct handler, typically in the form of a web API. But how do messages get routed to the correct part of the code for each message? Built into HTTP protocol is a specification of methods: GET, POST, PUT, etc. These are then mapped by developers in the web API to the appropriate code to handle that method:
+To better understand the problem this library is meant to solve, let's compare and contrast handling commands using a typical HTTP web api versus using an MQTT broker. In HTTP, message routing and handling are well established patterns defined by the protocol. A URL, composed of a domain ('www.myCompany.com/api') and resource structure ("/myResource/{id}") will deliver the message to that endpoint, and then call the appropriate handler based on the built in methods GET, POST, PUT, etc. These are then mapped by developers in the web API to the appropriate code to handle that method:
 
     ``` psuedo-code
         webapp.MapGet("/myResource/{id}", GetResourceHandler)
@@ -25,7 +30,7 @@ Why?
         ...
     ```
 
-    Comparing that to the MQTT protocol, the topic structure serves as a routing mechansim in much the same way as the URL does in HTTP. However, unlike HTTP there are no methods like GET, POST, etc. in MQTT. Once the message is pulled from the topic, we typically use attributes on the message envelope, such as message type, to determine which part of the system - which component or method - should recieve the method. This will then often be implemented in a switch/case statment type structure:
+Comparing that to the MQTT protocol, the topic structure serves as a routing mechanism in much the same way as the URL does in HTTP. However, unlike HTTP there are no built-in methods like GET, POST, etc. in MQTT. Once the message is pulled from the topic, we typically use attributes on the message envelope, such as message type, to determine which part of the system - which component or method - should receive the method. This will then often be implemented in a switch/case statement type structure:
 
     ``` psuedo-code
     switch (message.CommandType)
@@ -36,17 +41,19 @@ Why?
         case ...
     ```
 
-    This is brittle code that can be challenging and costly (particularly from a testing perspective) to change, and is an example of violating the [Open-Closed Principle (OCP)](https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle). The routing mechanism proposed here is based on the [Strategy Pattern](https://en.wikipedia.org/wiki/Strategy_pattern#:~:text=In%20computer%20programming%2C%20the%20strategy,family%20of%20algorithms%20to%20use) to allow the extension of behavior (adding new messages) without having to change existing code.
+This is brittle code that can be challenging and costly (particularly from a testing perspective) to change, and is an example of violating the [Open-Closed Principle (OCP)](https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle). The routing mechanism proposed here is based on the [Strategy Pattern](https://en.wikipedia.org/wiki/Strategy_pattern#:~:text=In%20computer%20programming%2C%20the%20strategy,family%20of%20algorithms%20to%20use) to allow the extension of behavior (adding new messages) without having to change existing code.
 
-3. Ok, but that just begs the question - if I control the topic structure and default MQTT behavior is to create queues on demand, why not just create as many topics as operations?
+## Implementation Overview
 
-   The answer to this question lies in one of MQTT's greatest strenghts: loose coupling. By introducing a broker between the message publisher and message subscribers, we minimize the amount of shared information needed for them to communicate. Creating topics down to the operation level, similar to an API specification, has a number of problems:
-   1. Exposes granular details of the API forcing clients to couple their code this structure.
-   2. Subscribers would have to subscribe to each topic to avoid any routing behavior. Subscribing to a wildcard would defeat the purpose of the granular topics and require internal routing based on topic name.
-   3. At scale this would result in a massive proliferation of topics.
-   4. While it is the default behavior of most brokers to create topics on demand, in the context of the AIO architecture, neither Event Hubs nor Event Grid MQTT broker can support this kind of dynamic behavior. The proliferation of topics will ripple into these subsystes, requiring provisioning and security on each and every topic/hub.
+Using this library is straightforward and requires only a few steps:
 
-   Ultimately, the best practices for topic naming will depend on the scenario, but at scale the most granular that we should aim for would be down to the leaf-node level. This means we would expect to see topics down to the deviceId or workloadId level. In highly dynamic scenarios, this may move up a level (e.g., a topic for all devices of a specific type) which would require routing based on attributes in the message to find the actual instance. This solution is meant for these scenarios.
+- Implement the ICommandRouter interface for each command type.
+- In your startup code, do the following:
+  - Register your ICommandRouter implementations with your IoC mechanism.
+  - Register the included PubSubClient, or your implementation of the IPubSubClient interface, with your IoC.
+  - Register the CommandDispatcher and request an instance from your IoC. Note this instance can be requested on a background thread if the larger service is handling requests or running operations other than processing MQTT messages.
+
+For further details and examples, see the [samples readme](./samples/README.md).
 
 ## Components
 
@@ -54,16 +61,16 @@ Why?
   - *PubSubClient* - Wraps the underlying MQTT client and exposes Publish and Subscribe mechanics.
   - *CommandDispatcher* - Takes a list of ICommandRouter objects, subscribes to their topics and routes messages to them.
 - [CommandDispatcher.Interfaces](./CommandDispatcher.Mqtt.Interfaces/)
-  - *ICommandRouter* - The primary interface that drives the CommandDispatcher. An implementor specifies the incoming copic, a message selector predicate for fine grained message selection and the execution method, RouteAsync, that takes the incoming message, makes whatever calls it needs and sends back any responses on the response topic.
+  - *ICommandRouter* - The primary interface that drives the CommandDispatcher. An implementor specifies the incoming topic, a message selector predicate for fine grained message selection and the execution method, RouteAsync, that takes the incoming message, makes whatever calls it needs and sends back any responses on the response topic.
   - *IRegisterCommandRouters* - This is used by the stand-alone ConsoleHost and the .Net plugin model for loading the implemented ICommandRouters used to interact with external services.
   - *IPubSubClient* - Abstraction used to interact with the underlying .Net library that directly talks to the broker over the MQTT protocol.
 - [CommandDispatcher.Models](./CommandDispatcher.Mqtt.Models/)
-  - *MessageEnvelope* - Optional Record Type intended as a common envelope used for all communication among servcies over MQTT.
+  - *MessageEnvelope* - Optional Record Type intended as a common envelope used for all communication among services over MQTT.
 - [CommandDispatcher.Mqtt.Dispatcher.ConsoleHost](./CommandDispatcher.Mqtt.Dispatcher.ConsoleHost/)
   - *LoopbackCommandRouter* - Used for validating that the ConsoleHost is running. Subscribes to the topic 'loopback/input' and returns a message on the topic 'loopback/output'.
   - *appSettings.json* - This needs to be modified by implementors of MessageRouting libraries to include library specific configuration. For more information see the [Sample](./Samples/README.md) and the implementation example in [DeviceRegistryCommandRouter](./Samples/DeviceRegistryCommandRouters/DeviceRegistryCommandRouter.cs) for how to access the configuration data.
 - [MqttNet](https://github.com/dotnet/MQTTnet)
-  - This is the underlying library used by CommandDispatcher.Mqtt to interact with the MQTT protocol. It is an MQTT v5 compliant library that is supported by the .NET Foundation and is effetively the default MQTT libarary for the .Net community. This library is abstracted away behind the *PubSubClient* and any futher capabilities that need to exposed from MqttNet will be done by mofifying the *PubSubClient*.
+  - This is the underlying library used by CommandDispatcher.Mqtt to interact with the MQTT protocol. It is an MQTT v5 compliant library that is supported by the .NET Foundation and is effetively the default MQTT libarary for the .Net community. This library is abstracted away behind the *PubSubClient* and any further capabilities that need to exposed from MqttNet will be done by mofifying the *PubSubClient*.
 
 ## Deployment Models
 
