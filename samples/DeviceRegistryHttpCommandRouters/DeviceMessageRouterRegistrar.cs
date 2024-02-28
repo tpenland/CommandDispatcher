@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Diagnostics;
-using Imv.Messaging.Mqtt.Interfaces;
-using Imv.Messaging.Mqtt.Models;
+using CommandDispatcher.Mqtt.Interfaces;
+using CloudNative.CloudEvents;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DeviceRegistryCommandRouters
@@ -12,9 +12,9 @@ namespace DeviceRegistryCommandRouters
             Guard.IsNotNull(services);
 
             services.AddHttpClient();
-            services.AddSingleton<ICommandRouter<MessageEnvelope>, CreateDeviceCommandRouter>();
-            services.AddSingleton<ICommandRouter<MessageEnvelope>, GetDeviceCommandRouter>();
-            services.AddSingleton<ICommandRouter<MessageEnvelope>, GetAllDevicesCommandRouter>();
+            services.AddSingleton<ICommandRouter<CloudEvent>, CreateDeviceCommandRouter>();
+            services.AddSingleton<ICommandRouter<CloudEvent>, GetDeviceCommandRouter>();
+            services.AddSingleton<ICommandRouter<CloudEvent>, GetAllDevicesCommandRouter>();
         }
     }
 }

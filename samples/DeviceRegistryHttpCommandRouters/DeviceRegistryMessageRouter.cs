@@ -1,14 +1,13 @@
-﻿using Imv.Messaging.Mqtt.Interfaces;
-using Imv.Messaging.Mqtt.Models;
+﻿using CloudNative.CloudEvents;
+using CommandDispatcher.Mqtt.CloudEvents;
+using CommandDispatcher.Mqtt.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Text.Unicode;
 
 namespace DeviceRegistryCommandRouters
 {
-    public abstract class DeviceRegistryCommandRouter : ICommandRouter<MessageEnvelope>
+    public abstract class DeviceRegistryCommandRouter : ICommandRouter<CloudEvent>
     {
         protected readonly ILogger _logger;
         protected readonly IHttpClientFactory _httpClientFactory;
@@ -35,13 +34,13 @@ namespace DeviceRegistryCommandRouters
 
         public string? OutgoingTopic => _outgoingTopic;
 
-        public IPubSubClient<MessageEnvelope>? PubSubClient { get; set; }
+        public IPubSubClient<CloudEvent>? PubSubClient { get; set; }
 
-        public virtual Predicate<MessageEnvelope> MessageSelector => throw new NotImplementedException();
+        public virtual Predicate<CloudEvent> MessageSelector => throw new NotImplementedException();
 
-        public virtual async Task RouteAsync(MessageEnvelope message)
+        public virtual async Task RouteAsync(CloudEvent message)
         {
-            _logger.LogInformation("Received message {message}", message.Payload);
+            _logger.LogInformation("Received message {message}", message.Data);
 
             HttpClient httpClient = GetClient();
             string jsonResponse = await CallHttpEndpoint(httpClient, message);
@@ -54,22 +53,22 @@ namespace DeviceRegistryCommandRouters
             return httpClient;
         }
 
-        protected abstract Task<string> CallHttpEndpoint(HttpClient httpClient, MessageEnvelope message);
+        protected abstract Task<string> CallHttpEndpoint(HttpClient httpClient, CloudEvent message);
 
-        protected virtual async Task PublishResponse(string jsonResponse, MessageEnvelope message)
+        protected virtual async Task PublishResponse(string jsonResponse, CloudEvent message)
         {
             byte[] bytes = Encoding.Default.GetBytes(jsonResponse);
             jsonResponse = Encoding.UTF8.GetString(bytes);
 
-            var responseMessage = new MessageEnvelope
+            var responseMessage = new CloudEvent
             {
                 Id = Guid.NewGuid().ToString(),
-                CorrelationId = message.CorrelationId,
-                ContextId = message.ContextId,
-                MessageType = message.MessageType,
-                Payload = jsonResponse,
-                CreatedAt = DateTime.UtcNow,
+                Source = message.Source,
+                Type = message.Type,
+                Data = jsonResponse,
+                Time = DateTime.UtcNow,
             };
+            responseMessage.SetCorrelationId(message.GetCorrelationId());
 
             if (PubSubClient != null)
             {
