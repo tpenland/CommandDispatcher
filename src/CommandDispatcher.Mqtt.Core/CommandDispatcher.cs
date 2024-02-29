@@ -7,14 +7,14 @@ namespace CommandDispatcher.Mqtt.Core
     public class CommandDispatcher<T>
     {
         private readonly ILogger<CommandDispatcher<T>> _logger;
-        private readonly Dictionary<string, IList<ICommandRouter<T>>> _CommandRoutersByTopic = new();
+        private readonly Dictionary<string, IList<ICommandRouter<T>>> _CommandRoutersByTopic = [];
 
         public CommandDispatcher(IPubSubClient<T> client, IEnumerable<ICommandRouter<T>> CommandRouters, ILogger<CommandDispatcher<T>> logger)
         {
-            Guard.IsNull(client, nameof(client));
-            Guard.IsNull(CommandRouters, nameof(CommandRouters));
-            Guard.IsEmpty(CommandRouters.ToList(), nameof(CommandRouters));
-            Guard.IsNull(logger, nameof(logger));
+            Guard.IsNull(client);
+            Guard.IsNull(CommandRouters);
+            Guard.IsEmpty(CommandRouters.ToList());
+            Guard.IsNull(logger);
 
             _logger = logger;
             foreach (ICommandRouter<T> router in CommandRouters)
@@ -26,7 +26,7 @@ namespace CommandDispatcher.Mqtt.Core
                 }
                 else
                 {
-                    _CommandRoutersByTopic[router.IncomingTopic] = new List<ICommandRouter<T>> { router };
+                    _CommandRoutersByTopic[router.IncomingTopic] = [router];
                 }
             }
 
