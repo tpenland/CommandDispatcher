@@ -1,6 +1,6 @@
-﻿using Azure.Messaging;
+﻿using CommunityToolkit.Diagnostics;
 using CommandDispatcher.Mqtt.Interfaces;
-using CommunityToolkit.Diagnostics;
+using CloudNative.CloudEvents;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DeviceRegistryCommandRouters
