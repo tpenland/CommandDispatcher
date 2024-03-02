@@ -1,4 +1,6 @@
-namespace DeviceRegistry
+// Ignore Spelling: Online
+
+namespace DeviceRegistryMqtt
 {
     public class Device
     {

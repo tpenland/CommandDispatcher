@@ -18,7 +18,9 @@ This library is meant as a code accelerator helping custom workloads at the edge
    2. The PubSubClient class can be used and/or extended, or substituted with an alternative implementation of [IPubSubClient](./src/CommandDispatcher.Mqtt.Interfaces/IPubSubClient.cs). 
 5. [Samples](./samples/README.md) folder that demonstrate the library's use:
    1. For an example of implementing the library as embedded dlls see
-   2. For an example using the stand-alone console host versions see
+   2. For an example using the stand-alone console host versions see 
+
+The intent is for teams to use this code as a jumping off point for handling commands. Clone it and modify it for your projects, or simply use it as a reference and take ideas and/or code snippets.
 
 ## Design Considerations
 
