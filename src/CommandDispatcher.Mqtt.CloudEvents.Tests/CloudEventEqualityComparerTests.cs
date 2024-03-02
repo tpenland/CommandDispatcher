@@ -1,4 +1,4 @@
-﻿using CloudNative.CloudEvents;
+﻿using Azure.Messaging;
 
 namespace CommandDispatcher.Mqtt.CloudEvents.Tests
 {
@@ -15,7 +15,7 @@ namespace CommandDispatcher.Mqtt.CloudEvents.Tests
         public void Equals_OneNullCloudEvent_ReturnsFalse()
         {
             var comparer = new CloudEventEqualityComparer();
-            var cloudEvent = new CloudEvent();
+            var cloudEvent = new CloudEvent("CloudEventEqualityComparerTests", "testEvent", "test");
             Assert.False(comparer.Equals(cloudEvent, null));
             Assert.False(comparer.Equals(null, cloudEvent));
         }
@@ -24,24 +24,9 @@ namespace CommandDispatcher.Mqtt.CloudEvents.Tests
         public void Equals_DifferentCloudEvents_ReturnsFalse()
         {
             var comparer = new CloudEventEqualityComparer();
-            var cloudEvent1 = new CloudEvent
-            {
-                Id = Guid.NewGuid().ToString(),
-                Source = new Uri("urn:CloudEventGenerator"),
-                Type = "TestMessage",
-                Subject = "Test",
-                Data = "test",
-                Time = DateTime.UtcNow
-            };
-            var cloudEvent2 = new CloudEvent
-            {
-                Id = Guid.NewGuid().ToString(),
-                Source = new Uri("urn:CloudEventGenerator"),
-                Type = "TestMessage",
-                Subject = "Test",
-                Data = "test",
-                Time = DateTime.UtcNow
-            };
+            var cloudEvent1 = new CloudEvent("CloudEventGenerator", "TestMessage", "test");
+            var cloudEvent2 = new CloudEvent("CloudEventGenerator", "TestMessage", "test");
+
             Assert.False(comparer.Equals(cloudEvent1, cloudEvent2));
         }
 
@@ -49,15 +34,8 @@ namespace CommandDispatcher.Mqtt.CloudEvents.Tests
         public void Equals_SameCloudEvents_ReturnsTrue()
         {
             var comparer = new CloudEventEqualityComparer();
-            var cloudEvent = new CloudEvent
-            {
-                Id = Guid.NewGuid().ToString(),
-                Source = new Uri("urn:CloudEventGenerator"),
-                Type = "TestMessage",
-                Subject = "Test",
-                Data = "test",
-                Time = DateTime.UtcNow
-            };
+            var cloudEvent = new CloudEvent("CloudEventGenerator", "TestMessage", "test");
+
             Assert.True(comparer.Equals(cloudEvent, cloudEvent));
         }
 
@@ -65,15 +43,8 @@ namespace CommandDispatcher.Mqtt.CloudEvents.Tests
         public void GetHashCode_ReturnsHashCode()
         {
             var comparer = new CloudEventEqualityComparer();
-            var cloudEvent = new CloudEvent
-            {
-                Id = Guid.NewGuid().ToString(),
-                Source = new Uri("urn:CloudEventGenerator"),
-                Type = "TestMessage",
-                Subject = "Test",
-                Data = "test",
-                Time = DateTime.UtcNow
-            };
+            var cloudEvent = new CloudEvent("CloudEventGenerator", "TestMessage", "test");
+
             Assert.Equal(cloudEvent.GetHashCode(), comparer.GetHashCode(cloudEvent));
         }
     }

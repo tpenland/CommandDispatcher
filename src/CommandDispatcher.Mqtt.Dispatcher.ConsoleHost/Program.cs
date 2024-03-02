@@ -1,5 +1,4 @@
-﻿using CloudNative.CloudEvents;
-using CommandDispatcher.Mqtt.CloudEvents;
+﻿using Azure.Messaging;
 using CommandDispatcher.Mqtt.Core;
 using CommandDispatcher.Mqtt.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -48,7 +47,6 @@ namespace CommandDispatcher.Mqtt.Dispatcher.ConsoleHost
         {
             var mqttSettings = LoadMqttSettings(builder.Configuration);
             builder.Services.AddSingleton(mqttSettings);
-            builder.Services.AddSingleton<IMqttMessageFormatter<CloudEvent>, CloudEvenMqttFormatter>();
             builder.Services.AddSingleton<IPubSubClient<CloudEvent>, PubSubClient<CloudEvent>>();
             builder.Services.AddSingleton<CommandDispatcher<CloudEvent>>();
         }

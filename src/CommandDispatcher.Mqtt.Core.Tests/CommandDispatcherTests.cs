@@ -1,4 +1,4 @@
-﻿using CloudNative.CloudEvents;
+﻿using Azure.Messaging;
 using CommandDispatcher.Mqtt.CloudEvents;
 using CommandDispatcher.Mqtt.Interfaces;
 using CommandDispatcher.Utilities;
@@ -29,12 +29,12 @@ namespace CommandDispatcher.Mqtt.Core.Tests
             var dispatcherLogger = new Mock<ILogger<CommandDispatcher<CloudEvent>>>();
 
             var routers = GetCommandRouters();
-            var pubSubClient = new PubSubClient<CloudEvent>(mqttSettings, new CloudEvenMqttFormatter(), pubSubLogger.Object);
+            var pubSubClient = new PubSubClient<CloudEvent>(mqttSettings, pubSubLogger.Object);
             _ = new CommandDispatcher<CloudEvent>(pubSubClient, routers, dispatcherLogger.Object);
 
-            var evalPubSubClient = new PubSubClient<CloudEvent>(mqttSettings, new CloudEvenMqttFormatter(), pubSubLogger.Object);
+            var evalPubSubClient = new PubSubClient<CloudEvent>(mqttSettings, pubSubLogger.Object);
 
-            var testMessages = GetTestMessages();
+            var testTopicAndMessageList = GetTestMessages();
             var messagesReceived = new List<CloudEvent>();
 
             await evalPubSubClient.Subscribe(responseTopic, (string topic, CloudEvent message) =>
@@ -46,7 +46,7 @@ namespace CommandDispatcher.Mqtt.Core.Tests
 
             await Task.Delay(1000);
 
-            foreach ((var topic, var testMessage) in testMessages)
+            foreach ((var topic, var testMessage) in testTopicAndMessageList)
             {
                 await pubSubClient.Publish(topic, testMessage);
             }
@@ -54,13 +54,13 @@ namespace CommandDispatcher.Mqtt.Core.Tests
             SpinWait.SpinUntil(() => messagesReceived.Count == 6, 5000);
 
             Assert.Equal(6, messagesReceived.Count);
-            foreach (var message in testMessages)
+            foreach (var topicMessageTuple in testTopicAndMessageList)
             {
-                var responses = messagesReceived.Where(m => m.GetCorrelationId() == message.Item2.GetCorrelationId());
+                var responses = messagesReceived.Where(m => m.GetCorrelationId() == topicMessageTuple.Item2.GetCorrelationId());
                 foreach (var response in responses)
                 {
-                    Assert.True(response.Data!.ToString() == $"Ok: {message.Item2.Data}",
-                        $"Expected Data {response.Data} but received {message.Item2.Data}");
+                    Assert.True(response.Data!.ToString() == topicMessageTuple.Item2.Data!.ToString(),
+                        $"Expected data {topicMessageTuple.Item2.Data} but received {response.Data}");
                 }
             }
             var correlationCount = messagesReceived.GroupBy(messagesReceived => messagesReceived.GetCorrelationId())
@@ -69,7 +69,7 @@ namespace CommandDispatcher.Mqtt.Core.Tests
                 .ToList();
 
             Assert.True(correlationCount.Count == 1, "There should only be 1 repeated correlationId");
-            var messageE = testMessages.First(m => m.Item2.Data!.ToString() == "E").Item2;
+            var messageE = testTopicAndMessageList.First(m => m.Item2.Data!.ToString().Trim('"') == "E").Item2;
             Assert.True(correlationCount[0].CorrelationId == messageE.GetCorrelationId(), "Message with Data E should be the duplicated message.");
             Assert.IsType<string>(messageE.GetCorrelationIdType());
         }
@@ -87,67 +87,27 @@ namespace CommandDispatcher.Mqtt.Core.Tests
 
         internal List<(string, CloudEvent)> GetTestMessages()
         {
-            var messages = new List<(string, CloudEvent)>
+            var topicMessageList = new List<(string, CloudEvent)>
             {
                 (
-                    commandTopic, new CloudEvent
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        Source = new Uri("urn:CommandDispatcherTests"),
-                        Type = "TestCommand01",
-                        Subject = "Test",
-                        Data = "A",
-                        Time = DateTime.UtcNow,
-                    }
+                    commandTopic, new CloudEvent("CommandDispatcherTests", "TestCommand01", "A")
                 ),
                 (
-                    commandTopic, new CloudEvent
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        Source = new Uri("urn:CommandDispatcherTests"),
-                        Type = "TestCommand02",
-                        Subject = "Test",
-                        Data = "B",
-                        Time = DateTime.UtcNow,
-                    }
+                    commandTopic, new CloudEvent("CommandDispatcherTests", "TestCommand02", "B")
                 ),
                 (
-                    commandTopic, new CloudEvent
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        Source = new Uri("urn:Device001"),
-                        Type = "TestCommand03",
-                        Subject = "Test",
-                        Data = "C",
-                        Time = DateTime.UtcNow,
-                    }
+                    commandTopic, new CloudEvent("Device001", "TestCommand03", "C")
                 ),
                 (
-                    $"{commandTopic}/foobar", new CloudEvent
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        Source = new Uri("urn:Device002"),
-                        Type = "TestCommand04",
-                        Subject = "Test",
-                        Data = "D",
-                        Time = DateTime.UtcNow,
-                    }
+                    $"{commandTopic}/foobar", new CloudEvent("Device002", "TestCommand04", "D")
                 ),
                 (
                     // This message will be duplicated between the CommandTypeCommandRouter and the DeviceCommandCommandRouter
-                    commandTopic, new CloudEvent
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        Source = new Uri("urn:Device001"),
-                        Type = "TestCommand02",
-                        Subject = "Test",
-                        Data = "E",
-                        Time = DateTime.UtcNow,
-                    }
+                    commandTopic, new CloudEvent("Device001", "TestCommand02", "E")
                 ),
             };
-            messages.ForEach(m => m.Item2.SetCorrelationId(Guid.NewGuid().ToString()));
-            return messages;
+            topicMessageList.ForEach(m => m.Item2.SetCorrelationId(Guid.NewGuid().ToString()));
+            return topicMessageList;
         }
 
         internal class CommandType01CommandRouter : ICommandRouter<CloudEvent>
@@ -161,15 +121,8 @@ namespace CommandDispatcher.Mqtt.Core.Tests
             {
                 // Simulate call to code that will handle the message.
                 await Task.Delay(100);
-                var response = new CloudEvent
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Source = message.Source,
-                    Type = message.Type,
-                    Subject = message.Subject,
-                    Data = $"Ok: {message.Data}",
-                    Time = DateTime.UtcNow,
-                };
+
+                var response = new CloudEvent(message.Source, message.Type, message.Data, "text/plain");
                 response.SetCorrelationId(message.GetCorrelationId());
 
                 if (PubSubClient != null)
@@ -190,15 +143,8 @@ namespace CommandDispatcher.Mqtt.Core.Tests
             {
                 // Simulate call to code that will handle the message.
                 await Task.Delay(100);
-                var response = new CloudEvent
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Source = message.Source,
-                    Type = message.Type,
-                    Subject = message.Subject,
-                    Data = $"Ok: {message.Data}",
-                    Time = DateTime.UtcNow,
-                };
+                
+                var response = new CloudEvent(message.Source, message.Type, message.Data, "text/plain");
                 response.SetCorrelationId(message.GetCorrelationId());
 
                 if (PubSubClient != null)
@@ -210,7 +156,7 @@ namespace CommandDispatcher.Mqtt.Core.Tests
 
         internal class DeviceCommandCommandRouter : ICommandRouter<CloudEvent>
         {
-            public Predicate<CloudEvent> MessageSelector => message => message.Source == new Uri("urn:Device001");
+            public Predicate<CloudEvent> MessageSelector => message => message.Source == "Device001";
             public string IncomingTopic => "commands";
             public string OutgoingTopic => "responses";
             public IPubSubClient<CloudEvent>? PubSubClient { get; set; }
@@ -219,15 +165,8 @@ namespace CommandDispatcher.Mqtt.Core.Tests
             {
                 // Simulate call to code that will handle the message.
                 await Task.Delay(100);
-                var response = new CloudEvent
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Source = message.Source,
-                    Type = message.Type,
-                    Subject = message.Subject,
-                    Data = $"Ok: {message.Data}",
-                    Time = DateTime.UtcNow,
-                };
+
+                var response = new CloudEvent(message.Source, message.Type, message.Data, "text/plain");
                 response.SetCorrelationId(message.GetCorrelationId());
 
                 if (PubSubClient != null)
@@ -248,17 +187,9 @@ namespace CommandDispatcher.Mqtt.Core.Tests
             {
                 // Simulate call to code that will handle the message.
                 await Task.Delay(100);
-                var response = new CloudEvent
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Source = message.Source,
-                    Type = message.Type,
-                    Subject = message.Subject,
-                    Data = $"Ok: {message.Data}",
-                    Time = DateTime.UtcNow,
-                };
-                response.SetCorrelationId(message.GetCorrelationId());
 
+                var response = new CloudEvent(message.Source, message.Type, message.Data, "text/plain");
+                response.SetCorrelationId(message.GetCorrelationId());
 
                 if (PubSubClient != null)
                 {

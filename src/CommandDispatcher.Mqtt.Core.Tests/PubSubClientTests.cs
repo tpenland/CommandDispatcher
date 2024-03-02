@@ -1,4 +1,6 @@
-using CloudNative.CloudEvents;
+// Ignore Spelling: Unsubscribe
+
+using Azure.Messaging;
 using CommandDispatcher.Mqtt.CloudEvents;
 using CommandDispatcher.TestHelpers;
 using CommandDispatcher.Utilities;
@@ -51,7 +53,7 @@ namespace CommandDispatcher.Mqtt.Core.Tests
             };
 
             var logger = new Mock<ILogger<PubSubClient<CloudEvent>>>();
-            var client = new PubSubClient<CloudEvent>(mqttSettings, new CloudEvenMqttFormatter(), logger.Object);
+            var client = new PubSubClient<CloudEvent>(mqttSettings, logger.Object);
             var ex = default(Exception);
             var eventReceived = new ManualResetEvent(false);
             client.ConnectingFailed += (args) =>
@@ -332,7 +334,7 @@ namespace CommandDispatcher.Mqtt.Core.Tests
             };
 
             var logger = new Mock<ILogger<PubSubClient<CloudEvent>>>();
-            return new PubSubClient<CloudEvent>(mqttSettings, new CloudEvenMqttFormatter(), logger.Object);
+            return new PubSubClient<CloudEvent>(mqttSettings, logger.Object);
         }
 
         public PubSubClient GetTestPubSubClient()

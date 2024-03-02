@@ -1,4 +1,4 @@
-﻿using CloudNative.CloudEvents;
+﻿using Azure.Messaging;
 using CommandDispatcher.Mqtt.CloudEvents;
 using CommandDispatcher.Mqtt.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -26,16 +26,7 @@ namespace CommandDispatcher.Mqtt.Dispatcher.ConsoleHost
         {
             await Task.Delay(100);
             _logger.LogInformation("Received message {message}", message.Data);
-
-            var response = new CloudEvent
-            {
-                Id = Guid.NewGuid().ToString(),
-                Source = new Uri("urn:CommandDispatcher:loopback:response"),
-                Type = "CommandDispatcher.loopback.response",
-                Subject = "loopback",
-                Data = message.Data,
-                Time = DateTime.UtcNow
-            };
+            var response = new CloudEvent("CommandDispatcher:loopback:response", "CommandDispatcher.loopback.response", message.Data);
             response.SetCorrelationId(message.GetCorrelationId());
 
             if (PubSubClient != null)

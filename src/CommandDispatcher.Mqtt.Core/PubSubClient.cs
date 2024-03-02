@@ -5,6 +5,9 @@ using MQTTnet.Client;
 using MQTTnet.Extensions.ManagedClient;
 using MQTTnet.Packets;
 using MQTTnet.Protocol;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
 
 namespace CommandDispatcher.Mqtt.Core
 {
@@ -14,7 +17,6 @@ namespace CommandDispatcher.Mqtt.Core
     /// <typeparam name="T"></typeparam>
     public class PubSubClient<T> : MqttClientBase, IPubSubClient<T>
     {
-        private readonly IMqttMessageFormatter<T> _messageFormatter;
         private readonly Dictionary<string, List<IPubSubClient<T>.MessageReceivedCallback>> _callbacks = new();
 
         public event Func<ConnectingFailedEventArgs, Task>? ConnectingFailed;
@@ -24,9 +26,8 @@ namespace CommandDispatcher.Mqtt.Core
         /// </summary>
         /// <param name="mqttSettings"></param>
         /// <param name="logger"></param>
-        public PubSubClient(MqttSettings mqttSettings, IMqttMessageFormatter<T> messageFormatter, ILogger<PubSubClient<T>> logger) : base(mqttSettings, logger)
+        public PubSubClient(MqttSettings mqttSettings, ILogger<PubSubClient<T>> logger) : base(mqttSettings, logger)
         {
-            _messageFormatter = messageFormatter;
             StartAsync().Wait();
         }
 
@@ -47,10 +48,10 @@ namespace CommandDispatcher.Mqtt.Core
         /// <param name="payload"></param>
         public async Task Publish(string topic, T payload, bool isRetained = false)
         {
-            Guard.IsNull(topic);
-            Guard.IsNull(payload);
+            ArgumentNullException.ThrowIfNull(topic);
+            ArgumentNullException.ThrowIfNull(payload);
 
-            byte[] formattedMessage = _messageFormatter.EncodeMessage(payload, out var contentType);
+            var formattedMessage = JsonSerializer.SerializeToUtf8Bytes(payload);
 
             if (formattedMessage is null || formattedMessage.Length == 0)
             {
@@ -77,7 +78,7 @@ namespace CommandDispatcher.Mqtt.Core
         /// <returns></returns>
         public async Task ClearRetainedMessage(string topic)
         {
-            Guard.IsNull(topic);
+            ArgumentNullException.ThrowIfNull(topic);
 
             byte[] zeroBytes = [];
             var qos = (MqttQualityOfServiceLevel)_mqttSettings!.MqttQualityOfServiceLevel;
@@ -100,8 +101,8 @@ namespace CommandDispatcher.Mqtt.Core
         /// <returns></returns>
         public async Task Subscribe(string topic, IPubSubClient<T>.MessageReceivedCallback callback)
         {
-            Guard.IsNull(topic);
-            Guard.IsNull(callback);
+            ArgumentNullException.ThrowIfNull(topic);
+            ArgumentNullException.ThrowIfNull(callback);
 
             MqttTopicFilter topicFilter = new MqttTopicFilterBuilder()
                 .WithTopic(topic)
@@ -128,7 +129,7 @@ namespace CommandDispatcher.Mqtt.Core
         /// <returns></returns>
         public async Task UnSubscribe(string topic)
         {
-            Guard.IsNull(topic);
+            ArgumentNullException.ThrowIfNull(topic);
 
             _callbacks.Remove(topic);
             await _mqttClient!.UnsubscribeAsync(topic);
@@ -146,7 +147,7 @@ namespace CommandDispatcher.Mqtt.Core
             }
             try
             {
-                var message = _messageFormatter.DecodeMessage(messageBytes);
+                var message = JsonSerializer.Deserialize<T>(messageBytes);
 
                 if (_callbacks.Count != 0)
                 {
@@ -156,7 +157,7 @@ namespace CommandDispatcher.Mqtt.Core
                     {
                         foreach (IPubSubClient<T>.MessageReceivedCallback callback in callbackList)
                         {
-                            callback(topic, message);
+                            callback(topic, message!);
                         }
                     }
                 }
@@ -214,8 +215,8 @@ namespace CommandDispatcher.Mqtt.Core
         /// <exception cref="NotImplementedException"></exception>
         public async Task Publish(string topic, string payload, bool isRetained = false)
         {
-            Guard.IsNull(topic);
-            Guard.IsNull(payload);
+            ArgumentNullException.ThrowIfNull(topic);
+            ArgumentNullException.ThrowIfNull(payload);
 
             var qos = (MqttQualityOfServiceLevel)_mqttSettings!.MqttQualityOfServiceLevel;
             MqttApplicationMessage message = new MqttApplicationMessageBuilder()
@@ -257,8 +258,8 @@ namespace CommandDispatcher.Mqtt.Core
         /// <returns></returns>
         public async Task Subscribe(string topic, IPubSubClient.MessageReceivedCallback callback)
         {
-            Guard.IsNull(topic);
-            Guard.IsNull(callback);
+            ArgumentNullException.ThrowIfNull(topic);
+            ArgumentNullException.ThrowIfNull(callback);
 
             MqttTopicFilter topicFilter = new MqttTopicFilterBuilder()
                 .WithTopic(topic)
@@ -278,7 +279,7 @@ namespace CommandDispatcher.Mqtt.Core
         /// <returns></returns>
         public async Task UnSubscribe(string topic)
         {
-            Guard.IsNull(topic);
+            ArgumentNullException.ThrowIfNull(topic);
 
             _callbacks.Remove(topic);
             await _mqttClient!.UnsubscribeAsync(topic);

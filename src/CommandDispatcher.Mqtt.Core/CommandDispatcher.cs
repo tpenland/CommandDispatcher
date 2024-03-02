@@ -1,7 +1,6 @@
 ﻿using CommandDispatcher.Mqtt.Interfaces;
 using Microsoft.Extensions.Logging;
 
-
 namespace CommandDispatcher.Mqtt.Core
 {
     public class CommandDispatcher<T>
@@ -11,10 +10,13 @@ namespace CommandDispatcher.Mqtt.Core
 
         public CommandDispatcher(IPubSubClient<T> client, IEnumerable<ICommandRouter<T>> CommandRouters, ILogger<CommandDispatcher<T>> logger)
         {
-            Guard.IsNull(client);
-            Guard.IsNull(CommandRouters);
-            Guard.IsEmpty(CommandRouters.ToList());
-            Guard.IsNull(logger);
+            ArgumentNullException.ThrowIfNull(client);
+            ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(CommandRouters);
+            if (!CommandRouters.Any())
+            {
+                throw new ArgumentException("No CommandRouters passed into CommandDispatcher");
+            }
 
             _logger = logger;
             foreach (ICommandRouter<T> router in CommandRouters)

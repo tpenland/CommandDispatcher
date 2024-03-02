@@ -1,4 +1,4 @@
-﻿using CloudNative.CloudEvents;
+﻿using Azure.Messaging;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CommandDispatcher.Mqtt.CloudEvents

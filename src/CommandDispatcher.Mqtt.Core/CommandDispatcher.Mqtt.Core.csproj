@@ -7,8 +7,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CloudNative.CloudEvents" Version="2.7.1" />
-		<PackageReference Include="CloudNative.CloudEvents.SystemTextJson" Version="2.7.1" />
+		<PackageReference Include="Azure.Core" Version="1.38.0" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
 		<PackageReference Include="MQTTnet" Version="4.3.3.952" />
@@ -16,7 +15,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\CommandDispatcher.Mqtt.CloudEvents\CommandDispatcher.Mqtt.CloudEvents.csproj" />
 	  <ProjectReference Include="..\CommandDispatcher.Mqtt.Interfaces\CommandDispatcher.Mqtt.Interfaces.csproj" />
 	</ItemGroup>
 

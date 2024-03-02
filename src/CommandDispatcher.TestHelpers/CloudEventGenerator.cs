@@ -1,6 +1,6 @@
-﻿using CloudNative.CloudEvents;
-using System.Collections;
+﻿using Azure.Messaging;
 using CommandDispatcher.Mqtt.CloudEvents;
+using System.Collections;
 
 namespace CommandDispatcher.TestHelpers
 {
@@ -39,15 +39,7 @@ namespace CommandDispatcher.TestHelpers
                 payload = System.Text.Json.JsonSerializer.Serialize(samplePoints);
             }
 
-            var message = new CloudEvent
-            {
-                Id = Guid.NewGuid().ToString(),
-                Source = new Uri("urn:CloudEventGenerator"),
-                Type = "TestMessage",
-                Subject = "Test",
-                Data = payload,
-                Time = DateTime.UtcNow
-            };
+            var message = new CloudEvent("CloudEventGenerator", "TestMessage", payload);
             message.SetCorrelationId(Guid.NewGuid().ToString());
 
             return message;

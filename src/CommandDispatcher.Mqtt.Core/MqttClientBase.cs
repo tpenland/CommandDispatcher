@@ -18,8 +18,8 @@ namespace CommandDispatcher.Mqtt.Core
 
         protected MqttClientBase(MqttSettings mqttSettings, ILogger logger)
         {
-            Guard.IsNull(mqttSettings);
-            Guard.IsNull(logger);
+            ArgumentNullException.ThrowIfNull(mqttSettings);
+            ArgumentNullException.ThrowIfNull(logger);
 
             _mqttSettings = mqttSettings;
             _logger = logger;
