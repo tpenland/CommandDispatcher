@@ -1,4 +1,4 @@
-﻿using CloudNative.CloudEvents;
+﻿using Azure.Messaging;
 using CommandDispatcher.Mqtt.CloudEvents;
 using CommandDispatcher.Mqtt.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -60,14 +60,7 @@ namespace DeviceRegistryCommandRouters
             byte[] bytes = Encoding.Default.GetBytes(jsonResponse);
             jsonResponse = Encoding.UTF8.GetString(bytes);
 
-            var responseMessage = new CloudEvent
-            {
-                Id = Guid.NewGuid().ToString(),
-                Source = message.Source,
-                Type = message.Type,
-                Data = jsonResponse,
-                Time = DateTime.UtcNow,
-            };
+            var responseMessage = new CloudEvent(message.Source, message.Type, jsonResponse);
             responseMessage.SetCorrelationId(message.GetCorrelationId());
 
             if (PubSubClient != null)

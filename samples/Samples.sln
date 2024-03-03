@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeviceRegistryHttpMessageRo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeviceRegistryMqtt", "DeviceRegistryMqtt\DeviceRegistryMqtt.csproj", "{3ABEAED4-875B-4BBC-AA0D-BBBCAE9A8368}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceRegistryTestClient", "DeviceRegistryTestClient\DeviceRegistryTestClient.csproj", "{1A7E6845-1FB9-43F4-B87B-A64A6FFA17D9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{3ABEAED4-875B-4BBC-AA0D-BBBCAE9A8368}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3ABEAED4-875B-4BBC-AA0D-BBBCAE9A8368}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3ABEAED4-875B-4BBC-AA0D-BBBCAE9A8368}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A7E6845-1FB9-43F4-B87B-A64A6FFA17D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A7E6845-1FB9-43F4-B87B-A64A6FFA17D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A7E6845-1FB9-43F4-B87B-A64A6FFA17D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A7E6845-1FB9-43F4-B87B-A64A6FFA17D9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

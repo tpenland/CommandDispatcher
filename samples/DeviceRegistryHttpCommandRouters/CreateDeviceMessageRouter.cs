@@ -1,5 +1,5 @@
-﻿using CommandDispatcher.Mqtt.Interfaces;
-using CloudNative.CloudEvents;
+﻿using Azure.Messaging;
+using CommandDispatcher.Mqtt.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Text;
