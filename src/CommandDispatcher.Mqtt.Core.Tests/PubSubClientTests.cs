@@ -1,5 +1,3 @@
-// Ignore Spelling: Unsubscribe
-
 using Azure.Messaging;
 using CommandDispatcher.Mqtt.CloudEvents;
 using CommandDispatcher.TestHelpers;

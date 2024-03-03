@@ -5,9 +5,7 @@ using MQTTnet.Client;
 using MQTTnet.Extensions.ManagedClient;
 using MQTTnet.Packets;
 using MQTTnet.Protocol;
-using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Unicode;
 
 namespace CommandDispatcher.Mqtt.Core
 {

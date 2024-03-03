@@ -31,15 +31,6 @@ public class DockerHelperTests : IDisposable
         Assert.Null(image);
     }
 
-    //[Fact]
-    //public async Task Dispose_CleansUp()
-    //{
-    //    var dockerHelper = DockerHelper.Instance;
-
-    //    dockerHelper.Dispose();
-    //    await Assert.ThrowsAsync<ObjectDisposedException>(async () => await dockerHelper.FindContainer("busybox"));
-    //}
-
     protected virtual void Dispose(bool disposing)
     {
         if (!disposedValue)
