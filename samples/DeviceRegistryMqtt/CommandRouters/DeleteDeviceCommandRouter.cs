@@ -4,18 +4,18 @@ using CommandDispatcher.Mqtt.Interfaces;
 using DeviceRegistryMqtt.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace DeviceRegistryMqtt.CommandRouters
 {
-    public class CreateDeviceCommandRouter : ICommandRouter<CloudEvent>
+    internal class DeleteDeviceCommandRouter : ICommandRouter<CloudEvent>
     {
         private readonly IDeviceRegistryService _registryService;
-        private readonly ILogger<CreateDeviceCommandRouter> _logger;
+        private readonly ILogger<DeleteDeviceCommandRouter> _logger;
         private readonly string _incomingTopic;
         private readonly string _outgoingTopic;
 
-        public CreateDeviceCommandRouter(IDeviceRegistryService registryService, ILogger<CreateDeviceCommandRouter> logger, IConfiguration configuration)
+        public DeleteDeviceCommandRouter(IDeviceRegistryService registryService, ILogger<DeleteDeviceCommandRouter> logger, IConfiguration configuration)
         {
             ArgumentNullException.ThrowIfNull(registryService);
             ArgumentNullException.ThrowIfNull(logger);
@@ -29,7 +29,7 @@ namespace DeviceRegistryMqtt.CommandRouters
         }
 
         public Predicate<CloudEvent> MessageSelector =>
-            message => message.Type == DeviceRegistryCommandTypes.CreateDevice.ToString();
+            message => message.Type == DeviceRegistryCommandTypes.DeleteDevice.ToString();
 
         public IPubSubClient<CloudEvent>? PubSubClient { get; set; }
 
@@ -39,35 +39,37 @@ namespace DeviceRegistryMqtt.CommandRouters
 
         public async Task RouteAsync(CloudEvent message)
         {
-            if (message.Data is null)
-            {
-                _logger.LogWarning("No device data sent with message");
-                return;
-            }
             try
             {
-                var device = JsonSerializer.Deserialize<Device>(message.Data);
-                if (device is null)
+                if (message.Data is null)
                 {
-                    _logger.LogWarning("Unable to deseriliaze device data");
+                    _logger.LogWarning("No device data sent with message");
                     return;
                 }
-                _logger.LogInformation("Creating device: {device}", device);
-                var createdDevice = await _registryService.CreateDevice(device);
-                var response = new CloudEvent("DeviceRegistryService", message.Type, createdDevice);
+                _logger.LogInformation("Deleting device {id}", message.Data);
+                
+                var id = Cleanup(message.Data.ToString());
+
+                await _registryService.DeleteDevice(id);
+
+                var response = new CloudEvent("DeviceRegistryService", message.Type, id);
                 response.SetCorrelationId(message.GetCorrelationId());
 
                 _logger.LogInformation("Publishing response to topic {topic}", _outgoingTopic);
                 await PubSubClient!.Publish(_outgoingTopic, response);
-            }
-            catch (JsonException ex)
-            {
-                _logger.LogError("Unable to deseriliaze device data: {}", ex.Message);
             }
             catch (Exception ex)
             {
                 _logger.LogError("An error occurred while processing the message: {}", ex.Message);
             }
         }
+
+        private string Cleanup(string data)
+        {
+            data = Regex.Unescape(data);
+            data = data.Replace("\"", "");
+            return data;
+        }
+
     }
 }

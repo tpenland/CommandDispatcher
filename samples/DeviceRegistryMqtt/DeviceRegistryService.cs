@@ -22,7 +22,7 @@ namespace DeviceRegistryMqtt
             return await _deviceRepository.CreateDevice(device);
         }
 
-        public async Task DeleteDevice(int id)
+        public async Task DeleteDevice(string id)
         {
             await _deviceRepository.DeleteDevice(id);
         }
@@ -32,7 +32,7 @@ namespace DeviceRegistryMqtt
             return await _deviceRepository.GetAllDevices();
         }
 
-        public async Task<Device?> GetDevice(int id)
+        public async Task<Device?> GetDevice(string id)
         {
             return await _deviceRepository.GetDevice(id);
         }
@@ -47,7 +47,7 @@ namespace DeviceRegistryMqtt
             return await _deviceRepository.GetOnlineDevices();
         }
 
-        public async Task UpdateDevice(int id, Device device)
+        public async Task UpdateDevice(string id, Device device)
         {
             await _deviceRepository.UpdateDevice(id, device);
         }

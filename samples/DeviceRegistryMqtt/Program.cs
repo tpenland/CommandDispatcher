@@ -51,6 +51,7 @@ namespace DeviceRegistryMqtt
             builder.Services.AddSingleton<IDeviceRegistryService, DeviceRegistryService>();
             builder.Services.AddSingleton<ICommandRouter<CloudEvent>, CreateDeviceCommandRouter>();
             builder.Services.AddSingleton<ICommandRouter<CloudEvent>, GetAllDevicesCommandRouter>();
+            builder.Services.AddSingleton<ICommandRouter<CloudEvent>, DeleteDeviceCommandRouter>();
 
             builder.Services.AddSingleton(mqttSettings);
             builder.Services.AddSingleton<IPubSubClient<CloudEvent>, PubSubClient<CloudEvent>>();

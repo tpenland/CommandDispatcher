@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Core" Version="1.38.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+    <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="4.3.3.952" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="CommandDispatcher.Mqtt.CloudEvents">
+      <HintPath>..\SharedLibraries\CommandDispatcher.Mqtt.CloudEvents.dll</HintPath>
+    </Reference>
+    <Reference Include="CommandDispatcher.Mqtt.Core">
+      <HintPath>..\SharedLibraries\CommandDispatcher.Mqtt.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="CommandDispatcher.Mqtt.Interfaces">
+      <HintPath>..\SharedLibraries\CommandDispatcher.Mqtt.Interfaces.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

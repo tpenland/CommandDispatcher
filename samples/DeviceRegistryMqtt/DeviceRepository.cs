@@ -24,7 +24,7 @@ namespace DeviceRegistryMqtt
             return await Devices.Where(t => t.Type == type).ToListAsync();
         }
 
-        public async Task<Device?> GetDevice(int id)
+        public async Task<Device?> GetDevice(string id)
         {
             return await Devices.FindAsync(id)
                 is Device device
@@ -40,7 +40,7 @@ namespace DeviceRegistryMqtt
             return device;
         }
 
-        public async Task UpdateDevice(int id, Device device)
+        public async Task UpdateDevice(string id, Device device)
         {
             var foundDevice = await Devices.FindAsync(id);
 
@@ -53,7 +53,7 @@ namespace DeviceRegistryMqtt
             await SaveChangesAsync();
         }
 
-        public async Task DeleteDevice(int id)
+        public async Task DeleteDevice(string id)
         {
             if (await Devices.FindAsync(id) is Device device)
             {

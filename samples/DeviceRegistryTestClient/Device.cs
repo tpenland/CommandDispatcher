@@ -1,4 +1,4 @@
-namespace DeviceRegistryMqtt
+namespace DeviceRegistryTestClient
 {
     public class Device
     {
