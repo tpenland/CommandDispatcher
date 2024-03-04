@@ -12,7 +12,6 @@ namespace DeviceRegistryTestClient
     internal static class Program
     {
         private const string Mqtt_Settings_Node = "MqttSettings";
-        private static ILogger? _logger;
         private static MqttSettings? _mqttSettings;
         private static string? _commandTopic;
         private static string? _responseTopic;
@@ -46,11 +45,9 @@ namespace DeviceRegistryTestClient
 
         private async static Task Initialize()
         {
-            var loggerFactory = InitLoggingFactory();
-            _logger = loggerFactory.CreateLogger("Program");
-
             LoadConfiguration();
 
+            var loggerFactory = InitLoggingFactory();
             _publisher = new PubSubClient<CloudEvent>(_mqttSettings!, loggerFactory.CreateLogger<PubSubClient<CloudEvent>>());
             var subscriber = new PubSubClient<CloudEvent>(_mqttSettings!, loggerFactory.CreateLogger<PubSubClient<CloudEvent>>());
             await subscriber.Subscribe(_responseTopic!, HandleResponses);
@@ -117,7 +114,6 @@ namespace DeviceRegistryTestClient
             Console.ResetColor();
 
             await _publisher!.Publish(_commandTopic!, cloudEvent);
-
         }
 
         private static void GetAllDevices()
