@@ -1,6 +1,6 @@
 namespace DeviceRegistryCommandRouters
 {
-    enum DeviceRegistryMessageTypes
+    enum DeviceRegistryCommandTypes
     {
         GetAllDevices,
         GetOnlineDevices,

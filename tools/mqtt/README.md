@@ -34,3 +34,11 @@ A useful way to diagnose issues like what config file got mounted, you can open 
 ``` shell
 docker exec -it {containerName or Id} sh
 ```
+
+### Publish Multiple Messages
+
+A useful capability of the mosquitto_pub tool is to publish messages in bulk from a file or other input. This can do with the following command:
+
+```bash
+    cat myMessages.json | mosquitto_pub -t device-registry/incoming -l
+```

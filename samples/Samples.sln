@@ -5,11 +5,11 @@ VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeviceRegistryHttp", "DeviceRegistryHttp\DeviceRegistryHttp.csproj", "{67237B5A-6503-49BD-AAFF-65AA40145C26}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeviceRegistryHttpMessageRouters", "DeviceRegistryHttpCommandRouters\DeviceRegistryHttpMessageRouters.csproj", "{0A24A046-8404-43C5-9075-D95FDE631FD3}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeviceRegistryMqtt", "DeviceRegistryMqtt\DeviceRegistryMqtt.csproj", "{3ABEAED4-875B-4BBC-AA0D-BBBCAE9A8368}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceRegistryTestClient", "DeviceRegistryTestClient\DeviceRegistryTestClient.csproj", "{1A7E6845-1FB9-43F4-B87B-A64A6FFA17D9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeviceRegistryHttpCommandRouters", "DeviceRegistryHttpCommandRouters\DeviceRegistryHttpCommandRouters.csproj", "{2595558C-ADAC-414A-8A53-59EAE25299EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +21,6 @@ Global
 		{67237B5A-6503-49BD-AAFF-65AA40145C26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67237B5A-6503-49BD-AAFF-65AA40145C26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67237B5A-6503-49BD-AAFF-65AA40145C26}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0A24A046-8404-43C5-9075-D95FDE631FD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0A24A046-8404-43C5-9075-D95FDE631FD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0A24A046-8404-43C5-9075-D95FDE631FD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0A24A046-8404-43C5-9075-D95FDE631FD3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3ABEAED4-875B-4BBC-AA0D-BBBCAE9A8368}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3ABEAED4-875B-4BBC-AA0D-BBBCAE9A8368}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3ABEAED4-875B-4BBC-AA0D-BBBCAE9A8368}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,6 +29,10 @@ Global
 		{1A7E6845-1FB9-43F4-B87B-A64A6FFA17D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A7E6845-1FB9-43F4-B87B-A64A6FFA17D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A7E6845-1FB9-43F4-B87B-A64A6FFA17D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2595558C-ADAC-414A-8A53-59EAE25299EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2595558C-ADAC-414A-8A53-59EAE25299EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2595558C-ADAC-414A-8A53-59EAE25299EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2595558C-ADAC-414A-8A53-59EAE25299EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

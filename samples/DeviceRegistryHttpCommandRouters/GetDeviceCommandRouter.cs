@@ -12,7 +12,7 @@ public class GetDeviceCommandRouter : DeviceRegistryCommandRouter, ICommandRoute
     { }
 
     Predicate<CloudEvent> ICommandRouter<CloudEvent>.MessageSelector =>
-        message => message.Type == DeviceRegistryMessageTypes.GetDevice.ToString();
+        message => message.Type == DeviceRegistryCommandTypes.GetDevice.ToString();
 
     protected override async Task<string> CallHttpEndpoint(HttpClient httpClient, CloudEvent message)
     {
