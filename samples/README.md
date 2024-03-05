@@ -19,9 +19,7 @@ These can be used to demonstrate the two primary runtime models for the CommandD
 
 ## Pre-requisites
 
-The following are required to run the DeviceRegistry sample:
-    - A running MQTT broker such as AIO MQ or Mosquitto
-    - An MQTT tool such as the mosquitto client command line utilities (i.e. mosquitto_sub and mosquitto_pub) or MQTT Explorer that will enable viewing topics and publishing messages.
+The only external requirement is access to an MQTT broker. Currently, the CommandDispatcher library does not support authentication to the server, so the MQTT broker must run in unauthenticated or anonymous mode. For a simple, light-weight broker that can be run in a container, see the instructions for running Mosquitto MQTT broker [here](../tools/mqtt/README.md).
 
 ## Execution
 
@@ -47,9 +45,9 @@ The following are required to run the DeviceRegistry sample:
    ```
 
     - MqttSettings: This should be modified to match address and port of the running MQTT broker.
-    - DeviceRegistry: These settings will be used by the DeviceRegistryHttp and DeviceRegistryCommandRouters.
-      - IncomingTopic is the MQTT Topic used by the DeviceRegistryCommandRouters to subscribe to the appropriate messages.
-      - OutgoingTopic is the MQTT Topic used by the DeviceRegistryCommandRouters to publish responses.
+    - DeviceRegistry: These settings will be used by the DeviceRegistryHttp and DeviceRegistryHttpCommandRouters.
+      - IncomingTopic is the MQTT Topic used by the DeviceRegistryHttpCommandRouters to subscribe to the appropriate messages.
+      - OutgoingTopic is the MQTT Topic used by the DeviceRegistryHttpCommandRouters to publish responses.
 3. Run the [DeviceRegistryMqtt](./DeviceRegistryMqtt/) project.
 4. Update the DeviceRegistryTestClient [appsettings.json](./DeviceRegistryTestClient/appsettings.json) with the values used above in the DeviceRegistryMqtt [appsettings.json] to ensure the correct MQTT broker and topics are used by the test client.
 5. Run the [DeviceRegistryTestClient].
@@ -60,7 +58,7 @@ The following are required to run the DeviceRegistry sample:
 ### [Hosted](#Hosted) Sample
 
 1. Build the [CommandDispatcher.Mqtt.Dispatcher.ConsoleHost](../src/CommandDispatcher.Mqtt.Dispatcher.ConsoleHost/) project.
-2. Run the script appropriate to your operating system to copy the required DLLs (see CommandDispatcher.Mqtt.Dispatcher.ConsoleHost.deps.json) to the /Samples/SharedLibraries folder. The DeviceRegistryCommandRouters project requires those DLLs to build.
+2. Run the script appropriate to your operating system to copy the required DLLs (see CommandDispatcher.Mqtt.Dispatcher.ConsoleHost.deps.json) to the /Samples/SharedLibraries folder. The DeviceRegistryHttpCommandRouters project requires those DLLs to build.
    - Windows: [updateSharedDlls.bat](./updateSharedDlls.bat)
    - Linux: [updateSharedDlls.sh](./updateSharedDlls.sh)
 3. Build the [DeviceRegistryHttpCommandRouters](./DeviceRegistryHttpCommandRouters/) project.
@@ -76,7 +74,7 @@ The following are required to run the DeviceRegistry sample:
             "MqttQualityOfServiceLevel": 1
         },
         "CommandRouterDlls": [
-                "C:\\Dev\\CommandDispatcher\\Samples\\PluginLibraries\\DeviceRegistryCommandRouters.dll"
+                "C:\\Dev\\CommandDispatcher\\Samples\\PluginLibraries\\DeviceRegistryHttpCommandRouters.dll"
             ],
         "DeviceRegistry": {
             "BaseAddress": "http://localhost:5270/",
@@ -87,15 +85,15 @@ The following are required to run the DeviceRegistry sample:
    ```
 
     - MqttSettings: This should be modified to match address and port of the running MQTT broker.
-    - CommandRouterDlls: This should point to folder containing the DeviceRegistryCommandRouters.dll (e.g. \Samples\PluginLibraries)
-    - DeviceRegistry: These settings will be used by the DeviceRegistryHttp and DeviceRegistryCommandRouters.
+    - CommandRouterDlls: This should point to folder containing the DeviceRegistryHttpCommandRouters.dll (e.g. \Samples\PluginLibraries)
+    - DeviceRegistry: These settings will be used by the DeviceRegistryHttp and DeviceRegistryHttpCommandRouters.
       - BaseAddress based needs to match the InMemoryHttpDeviceRegistry API address.
       - ApiEndpoint should not change unless the corresponding changes are made to the DeviceRegistry project.
-      - IncomingTopic is the MQTT Topic used by the DeviceRegistryCommandRouters to subscribe to the appropriate messages.
-      - OutgoingTopic is the MQTT Topic used by the DeviceRegistryCommandRouters to publish responses.
+      - IncomingTopic is the MQTT Topic used by the DeviceRegistryHttpCommandRouters to subscribe to the appropriate messages.
+      - OutgoingTopic is the MQTT Topic used by the DeviceRegistryHttpCommandRouters to publish responses.
 6. Run the [DeviceRegistryHttp](./DeviceRegistryHttp/) process to start the Web API.
 7. Run the [CommandDispatcher.Mqtt.Dispatcher.ConsoleHost](../src/CommandDispatcher.Mqtt.Dispatcher.ConsoleHost/)
-   - This will load the DeviceRegistryCommandRouters.dll into the ConsoleHost process and subscribe to the IncomingTopic defined in appsettings.json.
+   - This will load the DeviceRegistryHttpCommandRouters.dll into the ConsoleHost process and subscribe to the IncomingTopic defined in appsettings.json.
 8. Update the DeviceRegistryTestClient [appsettings.json](./DeviceRegistryTestClient/appsettings.json) with the values used above in the CommandDispatcher.Mqtt.Dispatcher.ConsoleHost [appsettings.json] to ensure the correct MQTT broker and topics are used by the test client.
 9. Run the [DeviceRegistryTestClient].
    - Use the menu to automatically create, query and delete devices.
