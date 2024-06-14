@@ -15,7 +15,7 @@ This library is meant as a code accelerator helping custom workloads at the edge
    2. Simply implement the appropriate interfaces (ICommandRouter and IRegisterCommandRouter) in a dll, drop it in the appropriate folder and add the dll name to the manifest.
 4. Uses the MqttNet library for all Mqtt communication.
    1. Contains a facade, [PubSubClient](./src/CommandDispatcher.Mqtt.Core/PubSubClient.cs), used by the [CommandDispatcher](./src/CommandDispatcher.Mqtt.Core/CommandDispatcher.cs), that exposes simple publish and subscribe functionality.
-   2. The PubSubClient class can be used and/or extended, or substituted with an alternative implementation of [IPubSubClient](./src/CommandDispatcher.Mqtt.Interfaces/IPubSubClient.cs). 
+   2. The PubSubClient class can be used and/or extended, or substituted with an alternative implementation of [IPubSubClient](./src/CommandDispatcher.Mqtt.Interfaces/IPubSubClient.cs).
 5. [Samples](./samples/README.md) folder that demonstrate the library's use:
    1. For an example of implementing the library as embedded dlls see
    2. For an example using the stand-alone console host versions see
@@ -24,7 +24,7 @@ This library is meant as a code accelerator helping custom workloads at the edge
 
 To better understand the problem this library is meant to solve, let's compare and contrast handling commands using a typical HTTP web api versus using an MQTT broker. In HTTP, message routing and handling are well established patterns defined by the protocol. A URL, composed of a domain ('www.myCompany.com/api') and resource structure ("/myResource/{id}") will deliver the message to that endpoint, and then call the appropriate handler based on the built in methods GET, POST, PUT, etc. These are then mapped by developers in the web API to the appropriate code to handle that method:
 
-    ``` psuedo-code
+    ``` psuedocode
         webapp.MapGet("/myResource/{id}", GetResourceHandler)
         webapp.MapPost("/myResource/", PostResourceHandler)
         ...
@@ -32,7 +32,7 @@ To better understand the problem this library is meant to solve, let's compare a
 
 Comparing that to the MQTT protocol, the topic structure serves as a routing mechanism in much the same way as the URL does in HTTP. However, unlike HTTP there are no built-in methods like GET, POST, etc. in MQTT. Once the message is pulled from the topic, we typically use attributes on the message envelope, such as message type, to determine which part of the system - which component or method - should receive the method. This will then often be implemented in a switch/case statement type structure:
 
-    ``` psuedo-code
+    ``` psuedocode
     switch (message.CommandType)
         case CommandType.A:
             DoA(message);
@@ -70,7 +70,7 @@ For further details and examples, see the [samples readme](./samples/README.md).
   - *LoopbackCommandRouter* - Used for validating that the ConsoleHost is running. Subscribes to the topic 'loopback/input' and returns a message on the topic 'loopback/output'.
   - *appSettings.json* - This needs to be modified by implementors of MessageRouting libraries to include library specific configuration. For more information see the [Sample](./Samples/README.md) and the implementation example in [DeviceRegistryCommandRouter](./Samples/DeviceRegistryCommandRouters/DeviceRegistryCommandRouter.cs) for how to access the configuration data.
 - [MqttNet](https://github.com/dotnet/MQTTnet)
-  - This is the underlying library used by CommandDispatcher.Mqtt to interact with the MQTT protocol. It is an MQTT v5 compliant library that is supported by the .NET Foundation and is effetively the default MQTT libarary for the .Net community. This library is abstracted away behind the *PubSubClient* and any further capabilities that need to exposed from MqttNet will be done by mofifying the *PubSubClient*.
+  - This is the underlying library used by CommandDispatcher.Mqtt to interact with the MQTT protocol. It is an MQTT v5 compliant library that is supported by the .NET Foundation and is effectively the default MQTT library for the .Net community. This library is abstracted away behind the *PubSubClient* and any further capabilities that need to exposed from MqttNet will be done by modifying the *PubSubClient*.
 
 ## Deployment Models
 
