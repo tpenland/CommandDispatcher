@@ -2,7 +2,7 @@
 
 ## Overview
 
-This library is meant as a code accelerator helping custom workloads at the edge handle the expected synchronous request/response pattern of executing commands and sending responses when using the asynchronous publish/subscribe pattern of MQTT. More specifically, it is meant to help complex workloads that receive n number of different commands on one or more incoming topics properly route each command to the appropriate command handler, and return one or more responses back to the appropriate outbound topic. It has the following features:
+This library is a code accelerator helping custom workloads at the edge handle the expected synchronous request/response pattern of executing commands and sending responses when using the asynchronous publish/subscribe pattern of MQTT. More specifically, it is meant to help complex workloads that receive n number of different commands on one or more incoming topics properly route each command to the appropriate command handler, and return one or more responses back to the appropriate outbound topic. It has the following features:
 
 1. Simple interface-based routing mechanism using a variation of the [strategy pattern](https://en.wikipedia.org/wiki/Strategy_pattern#:~:text=In%20computer%20programming%2C%20the%20strategy,family%20of%20algorithms%20to%20use).
    1. Message routers can define routing rules based on message attributes and include the ability to publish responses.
