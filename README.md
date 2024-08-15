@@ -4,7 +4,7 @@
 
 ## Overview
 
-This library is a code accelerator, designed to help edge workloads communicating with the cloud via MQTT handle the routing and response to commands. While MQTT is an asynchronous pattern, there are a range of commands, specifically where there is a human in the loop, that require a synchronous or near synchronous response. This can be relatively easy for simple services, but as the complexity grows, so too do the challenges around command routing. This library provides a solution for these challenges. It has the following features:
+This library is a code accelerator, designed to help edge workloads communicating with the cloud via MQTT handle the routing and response to commands. While MQTT is an asynchronous pattern, there are a range of commands, specifically where there is a human in the loop, that require a synchronous or near synchronous response. This can be relatively easy for simple services, but as the complexity grows, so too do the challenges around command routing and response correlation. This library provides a solution for these challenges. It has the following features:
 
 1. Simple interface-based routing mechanism using a variation of the [strategy pattern](https://en.wikipedia.org/wiki/Strategy_pattern#:~:text=In%20computer%20programming%2C%20the%20strategy,family%20of%20algorithms%20to%20use).
    1. Message routers can define routing rules based on message attributes and include the ability to publish responses.
