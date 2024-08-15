@@ -1,24 +1,26 @@
 # Command Dispatcher
 
+![design](./docs/assets/CommandDispatcher_MessageFlow.png)
+
 ## Overview
 
-This library is a code accelerator helping custom workloads at the edge handle the expected synchronous request/response pattern of executing commands and sending responses when using the asynchronous publish/subscribe pattern of MQTT. More specifically, it is meant to help complex workloads that receive n number of different commands on one or more incoming topics properly route each command to the appropriate command handler, and return one or more responses back to the appropriate outbound topic. It has the following features:
+This library is a code accelerator, designed to help workloads using MQTT helping custom workloads at the edge handle the expected synchronous request/response pattern of executing commands and sending responses when using the asynchronous publish/subscribe pattern of MQTT. More specifically, it is meant to help complex workloads that receive n number of different commands on one or more incoming topics properly route each command to the appropriate command handler, and return one or more responses back to the appropriate outbound topic. It has the following features:
 
 1. Simple interface-based routing mechanism using a variation of the [strategy pattern](https://en.wikipedia.org/wiki/Strategy_pattern#:~:text=In%20computer%20programming%2C%20the%20strategy,family%20of%20algorithms%20to%20use).
    1. Message routers can define routing rules based on message attributes and include the ability to publish responses.
    2. New commands can be added without changing existing code.
-2. Integrates the [CloudEvents](https://cloudevents.io/) specification using the [CloudEvents C# sdk](https://github.com/cloudevents/sdk-csharp?tab=readme-ov-file).
+2. Provides a simplified facade over the popular [MqttNet library](https://github.com/dotnet/MQTTnet) for all Mqtt communication.
+   1. [PubSubClient](./src/CommandDispatcher.Mqtt.Core/PubSubClient.cs), used by the [CommandDispatcher](./src/CommandDispatcher.Mqtt.Core/CommandDispatcher.cs), exposes simple publish and subscribe functionality.
+   2. The PubSubClient class can be used and/or extended, or substituted with an alternative implementation of [IPubSubClient](./src/CommandDispatcher.Mqtt.Interfaces/IPubSubClient.cs).
+3. Integrates the [CloudEvents](https://cloudevents.io/) specification using the [CloudEvents C# sdk](https://github.com/cloudevents/sdk-csharp?tab=readme-ov-file).
    1. Includes an implementation of [CorrelationId](./src/CommandDispatcher.Mqtt.CloudEvents/CorrelationId.cs) based on CloudEvents extension attribute guidance.
    2. Use of CloudEvents is entirely optional and any custom envelope or even no envelope can be used instead.
-3. Includes an optional console host that allows the CommandDispatcher to be run as a stand-alone process acting as a gateway for other processes.
+4. Includes an optional console host that allows the CommandDispatcher to be run as a stand-alone process acting as a gateway for other processes.
    1. Uses the [C# plugin model](https://learn.microsoft.com/en-us/dotnet/core/tutorials/creating-app-with-plugin-support) to enable adding message handlers from other processes without altering any code in the console host.
    2. Simply implement the appropriate interfaces (ICommandRouter and IRegisterCommandRouter) in a dll, drop it in the appropriate folder and add the dll name to the manifest.
-4. Uses the MqttNet library for all Mqtt communication.
-   1. Contains a facade, [PubSubClient](./src/CommandDispatcher.Mqtt.Core/PubSubClient.cs), used by the [CommandDispatcher](./src/CommandDispatcher.Mqtt.Core/CommandDispatcher.cs), that exposes simple publish and subscribe functionality.
-   2. The PubSubClient class can be used and/or extended, or substituted with an alternative implementation of [IPubSubClient](./src/CommandDispatcher.Mqtt.Interfaces/IPubSubClient.cs).
 5. [Samples](./samples/README.md) folder that demonstrate the library's use:
-   1. For an example of implementing the library as embedded dlls see
-   2. For an example using the stand-alone console host versions see
+   1. [Embedded dlls](./samples/README.md#embedded-sample)
+   2. [Console host](./samples/README.md#hosted-sample)
 
 ## Design Considerations
 
